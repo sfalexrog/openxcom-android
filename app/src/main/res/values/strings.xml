@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">OpenXcom (beta)</string>
+    <string name="title_activity_preloader">PreloaderActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_dirs_config">DirsConfigActivity</string>
+    
+    <string name="config_help">Please specify paths to your X-Com data, paths for save games and configuration files</string>
+    <string name="config_use_cache">Use app cache to store data files (for Android 4.4 and above)</string>
+    <string name="config_data_path">Path to game data files:</string>
+    <string name="config_browse_button">Browse</string>
+    <string name="config_use_cache_save">Use app cache to keep saved games</string>
+    <string name="config_use_cache_conf">Use app cache to keep your configuration file</string>
+    <string name="config_save_path">Path to save game folder</string>
+    <string name="config_conf_path">Path to configuration files</string>
+    <string name="config_finish">Save and restart</string>
+    
+    <string name="daidalos_hello">Hello World!</string>
+    <string name="daidalos_select">Select</string>
+    <string name="daidalos_cancel">Cancel</string>
+    <string name="daidalos_ok">OK</string>
+    <string name="daidalos_new_file">New</string>
+    <string name="daidalos_create_file">Create file</string>
+    <string name="daidalos_create_folder">Create folder</string>
+    <string name="daidalos_accept">Accept</string>
+    <string name="daidalos_enter_file_name">Enter the name of the file that you want to create</string>
+    <string name="daidalos_enter_folder_name">Enter the name of the folder that you want to create</string>
+    <string name="daidalos_yes">Yes</string>
+    <string name="daidalos_no">No</string>
+    <string name="daidalos_confirm_select_file">Are you sure that you want to select the file \'$file_name\'?</string>
+    <string name="daidalos_confirm_create_file">The file \'$file_name\' do not exists, are you sure that you want to create it?</string>
+    <string name="daidalos_confirm_select_folder">Are you sure that you want to select the folder \'$file_name\'?</string>
+    <string name="daidalos_confirm_create_folder">The folder \'$file_name\' do not exists, are you sure that you want to create it?</string>
+    <string name="daidalos_select_folder">Select folder</string>
+    
+    <color name="daidalos_gray">#888</color>
+    <color name="daidalos_backgroud">#000</color>
+    <color name="daidalos_active_file">#fff</color>
+    <color name="daidalos_inactive_file">#888</color>
+    
+</resources>

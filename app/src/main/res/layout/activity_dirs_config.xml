@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${packageName}.${activityClass}" >
+
+    <TextView
+        android:id="@+id/textHelp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:text="@string/config_help" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:onClick="applyButtonPress"
+        android:text="@string/config_finish" />
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttonSave"
+        android:layout_below="@id/textHelp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/useDataCacheCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/config_use_cache" />
+
+                <TextView
+                    android:id="@+id/TextView02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/useDataCacheCheck"
+                    android:text="@string/config_data_path" />
+
+                <EditText
+                    android:id="@+id/dataPathEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/TextView02"
+                    android:layout_toLeftOf="@+id/dataBrowseButton"
+                    android:inputType="none" />
+
+                <Button
+                    android:id="@+id/dataBrowseButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/dataPathEdit"
+                    android:layout_alignParentRight="true"
+                    android:onClick="dataButtonPress"
+                    android:text="@string/config_browse_button" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/useSaveCacheCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/config_use_cache_save" />
+
+                <TextView
+                    android:id="@+id/TextView01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/useSaveCacheCheck"
+                    android:text="@string/config_save_path" />
+
+                <EditText
+                    android:id="@+id/savePathEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/TextView01"
+                    android:layout_toLeftOf="@+id/saveBrowseButton"
+                    android:inputType="none" >
+
+                    <requestFocus />
+                </EditText>
+
+                <Button
+                    android:id="@+id/saveBrowseButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/savePathEdit"
+                    android:layout_alignParentRight="true"
+                    android:onClick="saveButtonPress"
+                    android:text="@string/config_browse_button" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/useConfCacheCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/config_use_cache_conf" />
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/useConfCacheCheck"
+                    android:text="@string/config_conf_path" />
+
+                <EditText
+                    android:id="@+id/confPathEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/textView1"
+                    android:layout_toLeftOf="@+id/confBrowseButton"
+                    android:inputType="none" />
+
+                <Button
+                    android:id="@+id/confBrowseButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/confPathEdit"
+                    android:layout_alignParentRight="true"
+                    android:onClick="confButtonPress"
+                    android:text="@string/config_browse_button" />
+
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
