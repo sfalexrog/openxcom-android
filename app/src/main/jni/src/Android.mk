@@ -27,13 +27,15 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 
 LOCAL_ARM_MODE := arm
 
-OPENXCOM_VERSION := $(shell git -C $(LOCAL_PATH)/$(OPENXCOM_PATH) describe | sed 's/.*-/-/' | sed 's/.*/\\\"&\\\"/')
+OPENXCOM_VERSION := $(shell git -C $(LOCAL_PATH) describe | sed 's/.*-/-/' | sed 's/.*/\\\"&\\\"/')
 
 LOCAL_CFLAGS += -DOPENXCOM_VERSION_GIT="$(OPENXCOM_VERSION)"
 
 # Disable OpenGL renderer
 
 LOCAL_CFLAGS += -D__NO_OPENGL
+
+LOCAL_CXXFLAGS += -std=c++11
 
 ifneq ($(TARGET_ARCH_ABI),armeabi-v7a)
     LOCAL_ARM_NEON := false

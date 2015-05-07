@@ -32,4 +32,7 @@ proguard/
 app/src/main/obj/
 app/src/main/libs/
 
-
+#auto-generated files
+app/src/main/assets/data.zip
+app/src/main/assets/openxcom_data_marker
+app/src/main/assets/data.zip.MD5
