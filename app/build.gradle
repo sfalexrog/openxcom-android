@@ -32,10 +32,23 @@ android {
                 'clean'
     }
 
+    task updateData(type: Zip, description: 'Rebuild data file archive') {
+        def dataDir = file('src/main/jni/OpenXcom/bin/data').absolutePath;
+        from(dataDir)
+        destinationDir = file('src/main/assets')
+        archiveName = 'data.zip'
+    }
+
+    tasks.withType(Zip) {
+        task ->
+            task.doLast {
+                ant.checksum file: it.archivePath, algorithm: "MD5"
+            }
+    }
     clean.dependsOn 'cleanNative'
 
     tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn buildNative
+        compileTask -> compileTask.dependsOn buildNative, updateData
     }
 
 
