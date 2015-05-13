@@ -1,3 +1,5 @@
+import java.util.zip.ZipEntry
+
 apply plugin: 'com.android.application'
 
 android {
@@ -21,7 +23,7 @@ android {
 
     task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
         def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir\\ndk-build.cmd", "-C", file('src/main/jni').absolutePath,
+        commandLine "$ndkDir\\ndk-build.cmd" , "-C", file('src/main/jni').absolutePath,
                 '-j', Runtime.runtime.availableProcessors(),
                 'all'
     }
@@ -32,25 +34,18 @@ android {
                 'clean'
     }
 
-    task updateData(type: Zip, description: 'Rebuild data file archive') {
-        def dataDir = file('src/main/jni/OpenXcom/bin/data').absolutePath;
-        from(dataDir)
-        destinationDir = file('src/main/assets')
-        archiveName = 'data.zip'
-    }
-
     tasks.withType(Zip) {
         task ->
             task.doLast {
                 ant.checksum file: it.archivePath, algorithm: "MD5"
             }
     }
+
     clean.dependsOn 'cleanNative'
 
     tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn buildNative, updateData
+        compileTask -> compileTask.dependsOn buildNative
     }
-
 
     buildTypes {
         release {
@@ -58,4 +53,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+}
+
+def getFolder(resource) {
+    def binDir = file('src/main/jni/OpenXcom/bin/' + resource);
+    return binDir;
+}
+
+task packBin() {
+    ['common', 'standard', 'UFO', 'TFTD'].each { String res ->
+        println 'Packing ' + res + '...'
+        def zip = task("zip" + res, type: Zip)
+        zip.destinationDir = file('src/main/assets')
+        zip.archiveName = res + '.zip'
+        zip.from getFolder(res)
+        zip.into res
+        zip.execute()
+    }
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn packBin
 }
