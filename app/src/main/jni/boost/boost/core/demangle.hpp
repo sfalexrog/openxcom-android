@@ -25,6 +25,11 @@
 # define BOOST_CORE_HAS_CXXABI_H
 #endif
 
+// Workaround for broken cxxabi.h on Android
+#if defined( __ANDROID__ )
+# undef BOOST_CORE_HAS_CXXABI_H
+#endif
+
 #if defined( BOOST_CORE_HAS_CXXABI_H )
 # include <cxxabi.h>
 # include <cstdlib>
