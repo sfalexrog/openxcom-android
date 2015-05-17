@@ -36,3 +36,7 @@ app/src/main/libs/
 app/src/main/assets/data.zip
 app/src/main/assets/openxcom_data_marker
 app/src/main/assets/data.zip.MD5
+
+#keystore
+*.keystore
+signing.gradle

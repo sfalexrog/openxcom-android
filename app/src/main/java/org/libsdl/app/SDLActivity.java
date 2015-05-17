@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.lang.reflect.Method;
 
+import android.annotation.SuppressLint;
 import android.app.*;
 import android.content.*;
 import android.view.*;
@@ -1394,6 +1395,7 @@ class SDLJoystickHandler {
 }
 
 /* Actual joystick functionality available for API >= 12 devices */
+@SuppressLint("NewAPI")
 class SDLJoystickHandler_API12 extends SDLJoystickHandler {
 
     static class SDLJoystick {
@@ -1520,6 +1522,7 @@ class SDLJoystickHandler_API12 extends SDLJoystickHandler {
     }            
 }
 
+@SuppressLint("NewApi")
 class SDLGenericMotionListener_API12 implements View.OnGenericMotionListener {
     // Generic Motion (mouse hover, joystick...) events go here
     @Override
