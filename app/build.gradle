@@ -1,5 +1,6 @@
 // Dummy values
 ext.signing = [
+        enabled       : false,
         storeFilePath : '.keystore',
         storePassword : 'password',
         keyAlias      : 'alias',
@@ -31,17 +32,19 @@ android {
         }
     }
 
-    signingConfigs {
-        release {
-            storeFile file(project.signing.storeFilePath)
-            storePassword project.signing.storePassword
-            keyAlias project.signing.keyAlias
-            keyPassword project.signing.keyPassword
+    if (project.signing.enabled) {
+        signingConfigs {
+            release {
+                storeFile file(project.signing.storeFilePath)
+                storePassword project.signing.storePassword
+                keyAlias project.signing.keyAlias
+                keyPassword project.signing.keyPassword
+            }
         }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
