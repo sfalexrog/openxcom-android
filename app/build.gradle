@@ -1,6 +1,21 @@
-import java.util.zip.ZipEntry
+// Dummy values
+ext.signing = [
+        storeFilePath : '.keystore',
+        storePassword : 'password',
+        keyAlias      : 'alias',
+        keyPassword   : 'password',
+]
 
 apply plugin: 'com.android.application'
+if (file('signing.gradle').exists()) {
+    apply from: 'signing.gradle'
+}
+
+if (System.properties['os.name'].toLowerCase().contains('windows')) {
+    ext.ndkBin = 'ndk-build.cmd'
+} else {
+    ext.ndkBin = 'ndk-build'
+}
 
 android {
     compileSdkVersion 22
@@ -16,6 +31,20 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file(project.signing.storeFilePath)
+            storePassword project.signing.storePassword
+            keyAlias project.signing.keyAlias
+            keyPassword project.signing.keyPassword
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
         jni.srcDirs = []
@@ -23,14 +52,14 @@ android {
 
     task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
         def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir\\ndk-build.cmd" , "-C", file('src/main/jni').absolutePath,
+        commandLine "$ndkDir/$ndkBin" , "-C", file('src/main/jni').absolutePath,
                 '-j', Runtime.runtime.availableProcessors(),
                 'all'
     }
 
     task cleanNative(type: Exec, description: 'Clean JNI object files') {
         def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir\\ndk-build.cmd", '-C', file('src/main/jni').absolutePath,
+        commandLine "$ndkDir/$ndkBin", '-C', file('src/main/jni').absolutePath,
                 'clean'
     }
 
@@ -60,7 +89,7 @@ def getFolder(resource) {
     return binDir;
 }
 
-task packBin() {
+task packBin(description: 'Update data files.') {
     ['common', 'standard', 'UFO', 'TFTD'].each { String res ->
         println 'Packing ' + res + '...'
         def zip = task("zip" + res, type: Zip)
