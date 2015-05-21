@@ -1,7 +1,6 @@
-package org.libsdl.openxcom;
+package org.libsdl.openxcom.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,8 +31,6 @@ public final class FilesystemHelper {
 	public static void copyFile(File in, File out) throws IOException {
 		InputStream in_stream = new FileInputStream(in);
 		OutputStream out_stream = new FileOutputStream(out);
-		BufferedInputStream bis = new BufferedInputStream(in_stream, BUFFER_SIZE);
-		BufferedOutputStream bos = new BufferedOutputStream(out_stream, BUFFER_SIZE);
 		copyStream(in_stream, out_stream);
 	}
 	
@@ -77,7 +74,7 @@ public final class FilesystemHelper {
 			{
 				if (recursive) {
 					File out_subfolder = new File(out_folder.getAbsolutePath() + "/" + in_file.getName());
-					copyFolder(in_file, out_subfolder, recursive);
+					copyFolder(in_file, out_subfolder, true);
 				}
 			} else {
 				File out_file = new File(out_folder.getAbsolutePath() + "/" + in_file.getName());
@@ -101,9 +98,9 @@ public final class FilesystemHelper {
 		zipExtract(bis, out_dir);
 	}
 	/**
-	 * Reads the in_stream and extracts them to out_dir
-	 * @param in_stream
-	 * @param out_dir
+	 * Reads the in_stream and extracts them to out_dir.
+	 * @param in_stream Input stream corresponding to the zip file.
+	 * @param out_dir Output directory for the zip file contents.
 	 * @throws IOException
 	 */
 	public static void zipExtract(InputStream in_stream, File out_dir) throws IOException {
@@ -154,6 +151,4 @@ public final class FilesystemHelper {
 		}
 		return b1 == b2;
 	}
-	
-	
 }

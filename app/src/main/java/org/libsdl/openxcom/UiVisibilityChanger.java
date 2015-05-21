@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.util.Log;
@@ -13,16 +14,12 @@ import android.view.View;
  * A Runnable to perform actual UI changes; most code moved here from OpenXcom.java clusterfuck.
  *
  */
-@SuppressLint("NewApi")
 public class UiVisibilityChanger implements Runnable {
-	
-	// Key name for SharedPreferences 
-	protected final static String SYSTEM_UI_NAME = "SystemUIStyle";
-	
+
 	// UI styles as passed from native code
-	protected final static int SYSTEM_UI_ALWAYS_SHOWN = 0;
-	protected final static int SYSTEM_UI_LOW_PROFILE = 1;
-	protected final static int SYSTEM_UI_IMMERSIVE = 2;
+	private final static int SYSTEM_UI_ALWAYS_SHOWN = 0;
+	private final static int SYSTEM_UI_LOW_PROFILE = 1;
+	private final static int SYSTEM_UI_IMMERSIVE = 2;
 
 	private int mUiVisibilityFlags = 0;
 	private View mRootView = null;
@@ -40,7 +37,7 @@ public class UiVisibilityChanger implements Runnable {
 	
 	/**
 	 * Sets rootView to the specified target.
-	 * @param rootView
+	 * @param rootView New root view.
 	 */
 	private void setRootView(View rootView) {
 		mRootView = rootView;
@@ -52,6 +49,8 @@ public class UiVisibilityChanger implements Runnable {
 	 * or the view is not defined.
 	 * @param style Requested style - one of the SYSTEM_UI_ class constants.
 	 */
+    @TargetApi(16)
+    @SuppressWarnings("deprecated")
 	public void setUiVisibilityFlags(int style) {
 		int version = Build.VERSION.SDK_INT;
 		try {
@@ -103,6 +102,7 @@ public class UiVisibilityChanger implements Runnable {
 	/**
 	 * Sets UI visibility flags and attaches listener if needed.
 	 */
+    @SuppressWarnings("deprecated")
 	@Override
 	public void run() {
 		if (Build.VERSION.SDK_INT > 10)
@@ -123,7 +123,8 @@ public class UiVisibilityChanger implements Runnable {
 /**
  * A listener that restores UI visibility to its previous state if needed.
  */
-class uiVisibilityChangeListener implements View.OnSystemUiVisibilityChangeListener {
+@TargetApi(11)
+final class uiVisibilityChangeListener implements View.OnSystemUiVisibilityChangeListener {
 	
 	private Activity mActivity = null;
 	private int mUiFlags;

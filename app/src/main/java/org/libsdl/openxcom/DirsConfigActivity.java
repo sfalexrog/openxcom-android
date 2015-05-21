@@ -3,13 +3,12 @@ package org.libsdl.openxcom;
 import java.io.File;
 import java.io.IOException;
 
-import org.libsdl.openxcom.R;
+import org.libsdl.openxcom.config.Config;
+import org.libsdl.openxcom.util.FilesystemHelper;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,8 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -34,27 +31,8 @@ import ar.com.daidalos.afiledialog.FileChooserDialog;
 
 public class DirsConfigActivity extends Activity {
 	
-	SharedPreferences preferences; 
-	
-	// This can be accessed from outside the activity, so I won't need to remember the exact string.
-	public static final String PREFS_NAME = "OpenXcomPrefs";
-	
-	// These values will be stored in the preferences file.
-	private boolean useAppCache;
-	private boolean useAppCacheSave;
-	private boolean useAppCacheConf;
-	protected String dataPath;
-	protected String savePath;
-	protected String confPath;
-	
-	// These keys will be accesible outside the activity.
-	public static final String USE_APP_CACHE_KEY = "useAppCache";
-	public static final String USE_APP_CACHE_SAVE_KEY = "useAppCacheSave";
-	public static final String USE_APP_CACHE_CONF_KEY = "useAppCacheConf";
-	public static final String DATA_PATH_KEY = "dataPath";
-	public static final String SAVE_PATH_KEY = "savePath";
-	public static final String CONF_PATH_KEY = "confPath";
-	
+	private Config config;
+
 	private CheckBox useAppCacheCheck;
 	private CheckBox useAppCacheSaveCheck;
 	private CheckBox useAppCacheConfCheck;
@@ -68,24 +46,13 @@ public class DirsConfigActivity extends Activity {
 	private Button saveBrowseButton;
 	private Button confBrowseButton;
 	
-	// Stored values for directories:
-	//  external: outside private storage
-	//  private: in private storage
-	private String dataPath_external;
-	private String savePath_external;
-	private String confPath_external;
-	private String dataPath_private;
-	private String savePath_private;
-	private String confPath_private;
-	
 	private AlertDialog copyWarningDialog;
 	private FileChooserDialog dataDialog;
 	private FileChooserDialog saveDialog;
 	private FileChooserDialog confDialog;
 	
 	public Context context;
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Build.VERSION.SDK_INT >= 14) {
@@ -93,17 +60,11 @@ public class DirsConfigActivity extends Activity {
 		}
 		super.onCreate(savedInstanceState);
 		context = this;
+        config = Config.getInstance();
+        if (config == null) {
+            config = Config.createInstance(context);
+        }
 		setContentView(R.layout.activity_dirs_config);
-		
-		// Initialize default paths
-		// TODO: Save these paths as well, so that preferences would be nicer to use.
-		dataPath_external = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenXcom/data";
-		savePath_external = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenXcom";
-		confPath_external = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenXcom";
-
-		dataPath_private = getExternalFilesDir(null).getAbsolutePath() + "/data";
-		savePath_private = getExternalFilesDir(null).getAbsolutePath(); // Don't use another subfolder; it won't be created automagically.
-		confPath_private = getExternalFilesDir(null).getAbsolutePath() + "/conf";
 
 		dataBrowseButton = (Button) findViewById(R.id.dataBrowseButton);
 		saveBrowseButton = (Button) findViewById(R.id.saveBrowseButton);
@@ -119,33 +80,27 @@ public class DirsConfigActivity extends Activity {
 
 		confPathText = (EditText) findViewById(R.id.confPathEdit);
 
-		// Initialize preferences
-
-		preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		populatePreferences();
-		
 		// Prepare dialogs for showing
 		setupDialogs();
 
 		// Set view elements according to current preferences
-		useAppCacheCheck.setChecked(useAppCache);
-		useAppCacheSaveCheck.setChecked(useAppCacheSave);
-		useAppCacheConfCheck.setChecked(useAppCacheConf);
+		useAppCacheCheck.setChecked(config.getUseDataCache());
+		useAppCacheSaveCheck.setChecked(config.getUseSaveCache());
+		useAppCacheConfCheck.setChecked(config.getUseConfCache());
 		
-		dataPathText.setText(dataPath);
+		dataPathText.setText(config.getDataFolderPath());
 		dataPathText.setInputType(0);
-		savePathText.setText(savePath);
+		savePathText.setText(config.getSaveFolderPath());
 		savePathText.setInputType(0);
-		confPathText.setText(confPath);
+		confPathText.setText(config.getConfFolderPath());
 		confPathText.setInputType(0);
 		
-		saveBrowseButton.setEnabled(!useAppCacheSave);
-		confBrowseButton.setEnabled(!useAppCacheConf);
+		saveBrowseButton.setEnabled(!config.getUseSaveCache());
+		confBrowseButton.setEnabled(!config.getUseConfCache());
 
-		useAppCacheCheck.setChecked(useAppCache);
-		useAppCacheSaveCheck.setChecked(useAppCacheSave);
-		useAppCacheConfCheck.setChecked(useAppCacheConf);
-
+		useAppCacheCheck.setChecked(config.getUseDataCache());
+		useAppCacheSaveCheck.setChecked(config.getUseSaveCache());
+		useAppCacheConfCheck.setChecked(config.getUseConfCache());
 
 		// Set listeners for checkboxes
 
@@ -158,9 +113,8 @@ public class DirsConfigActivity extends Activity {
 						if (isChecked) {
 							copyWarningDialog.show();
 						} else {
-							useAppCache = false;
-							dataPath = dataPath_external;
-							dataPathText.setText(dataPath);
+                            config.setUseDataCache(false);
+							dataPathText.setText(config.getDataFolderPath());
 						}
 					}
 				} );
@@ -171,12 +125,11 @@ public class DirsConfigActivity extends Activity {
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						saveBrowseButton.setEnabled(!isChecked);
 						if (isChecked) {
-							savePath = savePath_private;
+                            savePathText.setText(config.getExternalFilesDir().getAbsolutePath());
 						} else {
-							savePath = savePath_external;
+                            savePathText.setText(config.getSaveFolderPath());
 						}
-						savePathText.setText(savePath);
-						useAppCacheSave = isChecked;
+						config.setUseSaveCache(isChecked);
 					}
 				} );
 
@@ -186,12 +139,11 @@ public class DirsConfigActivity extends Activity {
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						confBrowseButton.setEnabled(!isChecked);
 						if (isChecked) {
-							confPath = confPath_private;
+							confPathText.setText(config.getExternalFilesDir().getAbsolutePath());
 						} else {
-							confPath = confPath_external;
+							confPathText.setText(config.getConfFolderPath());
 						}
-						confPathText.setText(confPath);
-						useAppCacheConf = isChecked;
+						config.setUseConfCache(isChecked);
 					}
 				} );
 				
@@ -199,44 +151,9 @@ public class DirsConfigActivity extends Activity {
 	
 	@Override
 	protected void onStop() {
-		savePreferences();
+		config.save();
 		dismissDialogs();
 		super.onStop();
-	}
-	
-	private void populatePreferences() {
-		// Check if that's the first time we're running the app
-		if (!preferences.contains(USE_APP_CACHE_KEY)) {
-			useAppCache = false;
-			useAppCacheSave = false;
-			useAppCacheConf = false;
-			dataPath = dataPath_external;
-			savePath = savePath_external;
-			confPath = confPath_external;
-			//savePreferences();
-		} else {
-			// Load shared preferences
-			Log.i("com.example.test_config", "Shared preferences present!");
-			useAppCache = preferences.getBoolean(USE_APP_CACHE_KEY, false);
-			useAppCacheSave = preferences.getBoolean(USE_APP_CACHE_SAVE_KEY, false);
-			useAppCacheConf = preferences.getBoolean(USE_APP_CACHE_CONF_KEY, false);
-			dataPath = preferences.getString(DATA_PATH_KEY, "");
-			savePath = preferences.getString(SAVE_PATH_KEY, "");
-			confPath = preferences.getString(CONF_PATH_KEY, "");
-		}
-	}
-	
-	private void savePreferences() {
-		SharedPreferences.Editor editor = preferences.edit();
-		// Save current config
-		editor.putBoolean(USE_APP_CACHE_KEY, useAppCache);
-		editor.putBoolean(USE_APP_CACHE_SAVE_KEY, useAppCacheSave);
-		editor.putBoolean(USE_APP_CACHE_CONF_KEY, useAppCacheConf);
-		editor.putString(DATA_PATH_KEY, dataPath);
-		editor.putString(SAVE_PATH_KEY, savePath);
-		editor.putString(CONF_PATH_KEY, confPath);
-		
-		editor.commit();
 	}
 	
 	public void dataButtonPress(View view) {
@@ -244,12 +161,12 @@ public class DirsConfigActivity extends Activity {
 	}
 	
 	public void saveButtonPress(View view) {
-		saveDialog.loadFolder(savePath);
+		saveDialog.loadFolder(config.getSaveFolderPath());
 		saveDialog.show();
 	}
 	
 	public void confButtonPress(View view) {
-		confDialog.loadFolder(confPath);
+		confDialog.loadFolder(config.getConfFolderPath());
 		confDialog.show();
 		
 	}
@@ -266,10 +183,9 @@ public class DirsConfigActivity extends Activity {
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						useAppCache = true;
+                        config.setUseDataCache(true);
 						useAppCacheCheck.setChecked(true);
-						dataPath = dataPath_private;
-						dataPathText.setText(dataPath);
+						dataPathText.setText(config.getExternalFilesDir().getAbsolutePath());
 					}
 				});
 		copyDlgBuilder.setNegativeButton(android.R.string.no,
@@ -283,18 +199,17 @@ public class DirsConfigActivity extends Activity {
 				new DialogInterface.OnCancelListener() {
 					@Override
 					public void onCancel(DialogInterface dialog) {
-						useAppCache = false;
+						config.setUseDataCache(false);
 						useAppCacheCheck.setChecked(false);
-						dataPath = dataPath_external;
-						dataPathText.setText(dataPath);
+						dataPathText.setText(config.getDataFolderPath());
 					}
 				});
 
 		copyWarningDialog = copyDlgBuilder.create();
 		
 		dataDialog = new FileChooserDialog(this);
-		dataDialog.loadFolder(dataPath_external);
-		if (useAppCache) {
+		dataDialog.loadFolder(config.getDataFolderPath());
+		if (config.getUseDataCache()) {
 			// Ignore ZIP files for now - it'll be too confusing.
 			// dataDialog.setFilter(".*zip|.*ZIP");
 			dataDialog.setShowConfirmation(true, false);
@@ -312,31 +227,26 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			public void onFileSelected(Dialog source, File file) {
 				source.hide();
-				if (useAppCache) {
+				if (config.getUseDataCache()) {
 					if (file.isDirectory()) {
 						copyData(file);
 					} else {
 						try {
-							FilesystemHelper.zipExtract(file, new File(dataPath_private));
+							FilesystemHelper.zipExtract(file, config.getExternalFilesDir());
 						}
 						catch (IOException e) {
 							e.printStackTrace();
 						}
 					}
 				} else {
-					File dataCheck = new File(file.getAbsolutePath() + "/data");
-					if (dataCheck.exists()) {
-						dataPath = dataCheck.getAbsolutePath();
-					} else {
-						dataPath = file.getAbsolutePath();
-					}
-					dataPathText.setText(dataPath);
+                    config.setDataFolderPath(file.getAbsolutePath());
+					dataPathText.setText(config.getDataFolderPath());
 				}
 			}
 		});
 		
 		saveDialog = new FileChooserDialog(this);
-		saveDialog.loadFolder(savePath);
+		saveDialog.loadFolder(config.getSaveFolderPath());
 		saveDialog.setFolderMode(true);
 		saveDialog.setCanCreateFiles(true);
 		saveDialog.setShowOnlySelectable(true);
@@ -345,7 +255,6 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			public void onFileSelected(Dialog source, File folder, String name) {
 				File saveFolder = new File(folder.getAbsolutePath() + "/" + name);
-				
 				if (saveFolder.mkdir()) {
 					Toast.makeText(source.getContext(), "Successfuly created folder: " + saveFolder.getName(), Toast.LENGTH_LONG).show();
 				} else {
@@ -356,15 +265,14 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			public void onFileSelected(Dialog source, File file) {
 				source.hide();
-				savePath_external = file.getAbsolutePath();
-				savePath = savePath_external;
-				savePathText.setText(savePath);
+                config.setSaveFolderPath(file.getAbsolutePath());
+				savePathText.setText(config.getSaveFolderPath());
 			}
 			
 		});
 		
 		confDialog = new FileChooserDialog(this);
-		confDialog.loadFolder(confPath);
+		confDialog.loadFolder(config.getConfFolderPath());
 		confDialog.setFolderMode(true);
 		confDialog.setCanCreateFiles(true);
 		confDialog.setShowOnlySelectable(true);
@@ -373,7 +281,6 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			public void onFileSelected(Dialog source, File folder, String name) {
 				File confFolder = new File(folder.getAbsolutePath() + "/" + name);
-				
 				if (confFolder.mkdir()) {
 					Toast.makeText(source.getContext(), "Successfuly created folder: " + confFolder.getName(), Toast.LENGTH_LONG).show();
 				} else {
@@ -384,9 +291,8 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			public void onFileSelected(Dialog source, File file) {
 				source.hide();
-				confPath_external = file.getAbsolutePath();
-				confPath = confPath_external;
-				confPathText.setText(confPath);
+                config.setConfFolderPath(file.getAbsolutePath());
+				confPathText.setText(config.getConfFolderPath());
 			}
 		});		
 	}
@@ -401,7 +307,7 @@ public class DirsConfigActivity extends Activity {
 	
 	// This will start the preloader, which will update the directories.
 	public void applyButtonPress(View view) {
-		savePreferences();
+		config.save();
 		Intent intent = new Intent(this, PreloaderActivity.class);
 		intent.putExtra("calledFrom", "DirsConfigActivity");
 		Log.i("DirsConfigActivity", "Launching Preloader to patch our files");
@@ -445,7 +351,7 @@ public class DirsConfigActivity extends Activity {
 				try {
 					publishProgress("Copying files...");
 					Log.i("DirsAsyncTask", "Calling copyFolder...");
-					FilesystemHelper.copyFolder(arg0[0], new File(dataPath_private), true);
+					FilesystemHelper.copyFolder(arg0[0], config.getExternalFilesDir(), true);
 				}
 				catch (Exception e) {
 					e.printStackTrace();

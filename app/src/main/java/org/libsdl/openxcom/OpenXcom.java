@@ -6,8 +6,10 @@ import java.util.Locale;
 
 import org.libsdl.app.SDLActivity;
 import org.libsdl.openxcom.UiVisibilityChanger;
+import org.libsdl.openxcom.config.Config;
 //import org.libsdl.openxcom.DirsConfigActivity;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,37 +30,27 @@ public class OpenXcom extends SDLActivity {
 
 	private final static String TAG = "OpenXcom";
 
-	public static int systemUIStyle;
-
-	protected final static String SYSTEM_UI_NAME = "SystemUIStyle";
-	protected final int SYSTEM_UI_ALWAYS_SHOWN = 0;
-	protected final int SYSTEM_UI_LOW_PROFILE = 1;
-	protected final int SYSTEM_UI_IMMERSIVE = 2;
-
 	protected UiVisibilityChanger uiVisibilityChanger = null;
-	
-	private String gamePath;
-	private String savePath;
-	private String confPath;
+
+	private Config config;
 
 	@Override
 	protected String[] getArguments() {
-		final String locale = Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry();
+		final String locale = Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry().toLowerCase();
 		return new String[] {
 			"-locale", locale,
-			"-data",   gamePath,
-			"-user",   savePath,
-			"-cfg",    confPath};
+			"-data",   config.getUseDataCache() ? config.getExternalFilesDir().getAbsolutePath() : config.getDataFolderPath(),
+			"-user",   config.getUseSaveCache() ? config.getExternalFilesDir().getAbsolutePath() : config.getSaveFolderPath(),
+			"-cfg",    config.getUseConfCache() ? config.getExternalFilesDir().getAbsolutePath() : config.getConfFolderPath()};
 	}
+
 	@Override
 	protected void onCreate(Bundle savedInstance) {
-		SharedPreferences preferences = getSharedPreferences(DirsConfigActivity.PREFS_NAME, 0);
-		// Load paths
-		gamePath = preferences.getString(org.libsdl.openxcom.DirsConfigActivity.DATA_PATH_KEY, "");
-		savePath = preferences.getString(org.libsdl.openxcom.DirsConfigActivity.SAVE_PATH_KEY, "");
-		confPath = preferences.getString(org.libsdl.openxcom.DirsConfigActivity.CONF_PATH_KEY, "");
-		systemUIStyle = preferences.getInt(SYSTEM_UI_NAME, 0);
-		uiVisibilityChanger = new UiVisibilityChanger(this, systemUIStyle);
+		config = Config.getInstance();
+		if (Config.getInstance() == null) {
+			config = Config.createInstance(this);
+		}
+		uiVisibilityChanger = new UiVisibilityChanger(this, config.getSystemUiStyle());
 		setSystemUI();
 		super.onCreate(savedInstance);
 	}
@@ -77,36 +69,40 @@ public class OpenXcom extends SDLActivity {
 	}
 
 	public void setSystemUI() {
-		uiVisibilityChanger.setUiVisibilityFlags(systemUIStyle);
+		uiVisibilityChanger.setUiVisibilityFlags(config.getSystemUiStyle());
 		runOnUiThread(uiVisibilityChanger);			
 	}
 
-	public static void showDirDialog() {
-		android.app.Activity context = (android.app.Activity) SDLActivity.getContext();
+    /**
+     * This method is called from JNI.
+     * It launches a new configuration activity in case there's a problem
+     * while loading game resources.
+     */
+	public void showDirDialog() {
 		Log.i(TAG, "Starting directory configuration dialog...");
-		Intent intent = new Intent(context, DirsConfigActivity.class);
-		context.startActivityForResult(intent, 0);
+		Intent intent = new Intent(this, DirsConfigActivity.class);
+		this.startActivityForResult(intent, 0);
 	}
 
+    /**
+     * This method is called from JNI.
+     * It sets the requested UI visibility style and saves the selected preference.
+     * @param newSystemUIStyle Requested UI visibility style.
+     */
 	public void changeSystemUI(int newSystemUIStyle) {
 		Log.i(TAG, "Changing system UI");
 		Log.i(TAG, "New style is: " + newSystemUIStyle);
-		systemUIStyle = newSystemUIStyle;
-		SharedPreferences preferences = getSharedPreferences(DirsConfigActivity.PREFS_NAME, 0);
-		SharedPreferences.Editor preferencesEditor = preferences.edit();
-		preferencesEditor.putInt(SYSTEM_UI_NAME, systemUIStyle);
-		preferencesEditor.apply();
+        config.setSystemUiStyle(newSystemUIStyle);
+        config.save();
 		setSystemUI();
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		SharedPreferences preferences = getSharedPreferences(DirsConfigActivity.PREFS_NAME, 0);
-		String dataPath = preferences.getString(DirsConfigActivity.DATA_PATH_KEY, "");
-		String savePath = preferences.getString(DirsConfigActivity.SAVE_PATH_KEY, "");
-		String confPath = preferences.getString(DirsConfigActivity.CONF_PATH_KEY, "");
-		nativeSetPaths(dataPath, savePath, confPath);
+		nativeSetPaths(config.getDataFolderPath(),
+                       config.getSaveFolderPath(),
+                       config.getConfFolderPath());
 	}
 	
 	public static native void nativeSetPaths(String dataPath, String savePath, String confPath);
@@ -121,7 +117,7 @@ public class OpenXcom extends SDLActivity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 	}
 
-};
+}
 
 
 
