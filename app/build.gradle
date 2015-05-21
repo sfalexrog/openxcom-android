@@ -93,15 +93,24 @@ def getFolder(resource) {
 }
 
 task packBin(description: 'Update data files.') {
+    def index = 0;
     ['common', 'standard', 'UFO', 'TFTD'].each { String res ->
-        println 'Packing ' + res + '...'
         def zip = task("zip" + res, type: Zip)
+        zip.doFirst { println('Packing ' + res + '...') }
         zip.destinationDir = file('src/main/assets')
-        zip.archiveName = res + '.zip'
+        zip.archiveName = index.toString() + "_" + res + '.zip'
         zip.from getFolder(res)
         zip.into res
         zip.execute()
+        index++;
     }
+    def zipTranslations = task("zipTranslations", type: Zip)
+    zipTranslations.doFirst { println('Packing translations...' )}
+    zipTranslations.destinationDir = file('src/main/assets')
+    zipTranslations.archiveName = '7_translations.zip'
+    zipTranslations.from getFolder('translations/x-com-1/output')
+    zipTranslations.into 'standard/xcom1/Language'
+    zipTranslations.execute()
 }
 
 gradle.projectsEvaluated {
