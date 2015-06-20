@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -65,12 +67,19 @@ public class PreloaderActivity extends Activity {
                 pd.setMessage("Initializing...");
                 pd.setCancelable(false);
                 pd.setIndeterminate(true);
-                pd.show();
                 Log.i(TAG, "Updating game data...");
                 assetContents = new TreeSet<>();
+                pd.show();
             }
 
             public void onProgressUpdate(String... message) {
+                /*if (!pd.isShowing()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pd.show();
+                        }});
+                }*/
                 pd.setMessage(message[0]);
             }
 
@@ -196,6 +205,18 @@ public class PreloaderActivity extends Activity {
 	 * @return True if the game files are properly installed.
 	 */
 	protected boolean hasGameFiles() {
+        try {
+            ZipInputStream ufo1zip = new ZipInputStream(assets.open("3_UFO.zip"));
+            ZipEntry ze = ufo1zip.getNextEntry();
+            while (ze != null) {
+                if(ze.getName().equals("UFO/TERRAIN/UFO1.PCK")) {
+                    return true;
+                }
+                ze = ufo1zip.getNextEntry();
+            }
+        } catch (IOException e) {
+            Log.w(TAG, "Could not open 3_UFO.zip; did you package your files correctly?");
+        }
         return new File(config.getDataFolderPath() + "/UFO/TERRAIN/UFO1.PCK").exists();
 	}
 }
