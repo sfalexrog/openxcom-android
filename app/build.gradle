@@ -55,8 +55,8 @@ android {
 
     task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
         def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir/$ndkBin" , "-C", file('src/main/jni').absolutePath,
-                '-j', Runtime.runtime.availableProcessors(),
+        commandLine "$ndkDir/$ndkBin", "-C", file('src/main/jni').absolutePath,
+                '-j' + Runtime.runtime.availableProcessors(),
                 'all'
     }
 
