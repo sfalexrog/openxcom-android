@@ -33,9 +33,16 @@ app/src/main/obj/
 app/src/main/libs/
 
 #auto-generated files
-app/src/main/assets/data.zip
-app/src/main/assets/openxcom_data_marker
-app/src/main/assets/data.zip.MD5
+app/src/main/assets/3_TFTD.zip.MD5
+app/src/main/assets/7_translations.zip
+app/src/main/assets/3_TFTD.zip
+app/src/main/assets/2_UFO.zip
+app/src/main/assets/7_translations.zip.MD5
+app/src/main/assets/2_UFO.zip.MD5
+app/src/main/assets/0_common.zip.MD5
+app/src/main/assets/1_standard.zip.MD5
+app/src/main/assets/1_standard.zip
+app/src/main/assets/0_common.zip
 
 #keystore
 *.keystore
