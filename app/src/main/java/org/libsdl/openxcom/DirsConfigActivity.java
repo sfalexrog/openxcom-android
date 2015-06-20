@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.libsdl.openxcom.config.Config;
+import org.libsdl.openxcom.config.DataCheckResult;
+import org.libsdl.openxcom.config.DataChecker;
+import org.libsdl.openxcom.config.Xcom1DataChecker;
 import org.libsdl.openxcom.util.FilesystemHelper;
 
 import android.app.Activity;
@@ -18,12 +21,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import ar.com.daidalos.afiledialog.FileChooserDialog;
 
@@ -45,13 +52,19 @@ public class DirsConfigActivity extends Activity {
 	private Button dataBrowseButton;
 	private Button saveBrowseButton;
 	private Button confBrowseButton;
+    private Button installButton;
 	
 	private AlertDialog copyWarningDialog;
 	private FileChooserDialog dataDialog;
 	private FileChooserDialog saveDialog;
 	private FileChooserDialog confDialog;
+	private FileChooserDialog installDialog;
+
+    private DataChecker checker;
 	
 	public Context context;
+
+	private TextView xcom1Status;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +82,7 @@ public class DirsConfigActivity extends Activity {
 		dataBrowseButton = (Button) findViewById(R.id.dataBrowseButton);
 		saveBrowseButton = (Button) findViewById(R.id.saveBrowseButton);
 		confBrowseButton = (Button) findViewById(R.id.confBrowseButton);
+        installButton = (Button) findViewById(R.id.dirsInstallFromDirButton);
 
 		useAppCacheCheck = (CheckBox) findViewById(R.id.useDataCacheCheck);
 		useAppCacheSaveCheck = (CheckBox) findViewById(R.id.useSaveCacheCheck);
@@ -80,8 +94,12 @@ public class DirsConfigActivity extends Activity {
 
 		confPathText = (EditText) findViewById(R.id.confPathEdit);
 
+        xcom1Status = (TextView) findViewById(R.id.dirsUfo1Status);
+
 		// Prepare dialogs for showing
 		setupDialogs();
+
+        updateStatus();
 
 		// Set view elements according to current preferences
 		useAppCacheCheck.setChecked(config.getUseDataCache());
@@ -170,6 +188,10 @@ public class DirsConfigActivity extends Activity {
 		confDialog.show();
 		
 	}
+
+    public void installButtonPress(View view) {
+        installDialog.show();
+    }
 	
 	// This prepares our dialog windows to be shown.
 	private void setupDialogs() {
@@ -229,7 +251,7 @@ public class DirsConfigActivity extends Activity {
 				source.hide();
 				if (config.getUseDataCache()) {
 					if (file.isDirectory()) {
-						copyData(file);
+						copyData(file, config.getExternalFilesDir());
 					} else {
 						try {
 							FilesystemHelper.zipExtract(file, config.getExternalFilesDir());
@@ -241,6 +263,7 @@ public class DirsConfigActivity extends Activity {
 				} else {
                     config.setDataFolderPath(file.getAbsolutePath());
 					dataPathText.setText(config.getDataFolderPath());
+                    updateStatus();
 				}
 			}
 		});
@@ -294,7 +317,49 @@ public class DirsConfigActivity extends Activity {
                 config.setConfFolderPath(file.getAbsolutePath());
 				confPathText.setText(config.getConfFolderPath());
 			}
-		});		
+		});
+
+        installDialog = new FileChooserDialog(this);
+        if (config.hasOldFiles()) {
+            installDialog.loadFolder(config.getOldFilesPath());
+        } else {
+            installDialog.loadFolder();
+        }
+        installDialog.setFolderMode(true);
+        installDialog.setCanCreateFiles(false);
+        installDialog.setShowOnlySelectable(true);
+        installDialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
+            @Override
+            public void onFileSelected(final Dialog source, final File file) {
+                DataCheckResult dcr = checker.checkWithPath(file.getAbsolutePath());
+                if (dcr.isFound()) {
+                    AlertDialog ad = new AlertDialog.Builder(source.getContext())
+                            .setCancelable(true)
+                            .setMessage("Are you sure you want to copy data from " + file.getAbsolutePath() + "?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    source.hide();
+                                    copyData(file, new File(config.getDataFolderPath()));
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                } else {
+                    new AlertDialog.Builder(source.getContext())
+                            .setCancelable(false)
+                            .setNeutralButton("OK", null)
+                            .setTitle("Warning")
+                            .setMessage("Could not find game data in this folder")
+                            .show();
+                }
+            }
+
+            @Override
+            public void onFileSelected(Dialog source, File folder, String name) {
+                // Do nothing.
+            }
+        });
 	}
 	
 	// This cleans up all dialogs.
@@ -303,6 +368,7 @@ public class DirsConfigActivity extends Activity {
 		dataDialog.dismiss();
 		saveDialog.dismiss();
 		confDialog.dismiss();
+        installDialog.dismiss();
 	}
 	
 	// This will start the preloader, which will update the directories.
@@ -325,7 +391,7 @@ public class DirsConfigActivity extends Activity {
 	}
 	
 	// Wrap the copy process in an AsyncTask while showing a ProgressDialog.
-	protected void copyData(File in_dir)
+	protected void copyData(File inDir, File outDir)
 	{
 		new AsyncTask<File, String, Void>() {
 			
@@ -349,9 +415,14 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			protected Void doInBackground(File... arg0) {
 				try {
-					publishProgress("Copying files...");
 					Log.i("DirsAsyncTask", "Calling copyFolder...");
-					FilesystemHelper.copyFolder(arg0[0], config.getExternalFilesDir(), true);
+                    for(String dirName: checker.getDirChecklist()) {
+                        publishProgress("Copying " + dirName + "...");
+                        File in = new File(arg0[0].getAbsolutePath() + "/" + dirName);
+                        File out = new File(arg0[1].getAbsolutePath() + "/"
+                                + checker.getInstallDir() + "/" + dirName.toUpperCase());
+                        FilesystemHelper.copyFolder(in, out, true);
+                    }
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -364,10 +435,40 @@ public class DirsConfigActivity extends Activity {
 				if (pd != null) {
 					pd.dismiss();
 				}
+                updateStatus();
 				Log.i("DirsConfigActivity", "Finishing asynctask...");	
 			}
 			
-		}.execute(in_dir);
-		
+		}.execute(inDir, outDir);
 	}
+
+    private void updateStatus() {
+        xcom1Status.setText("Status: checking...");
+        new AsyncTask<Void, Void, Void>() {
+            DataCheckResult result;
+            Spanned resultDisplay;
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                xcom1Status.setText(resultDisplay);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (checker == null) {
+                    checker = new Xcom1DataChecker();
+                }
+                result = checker.checkWithPath(config.getDataFolderPath() + "/UFO");
+                if (result.isFound()) {
+                    resultDisplay = Html.fromHtml("Status: <font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
+
+                } else {
+                    resultDisplay = Html.fromHtml("Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
+                }
+                return null;
+            }
+        }.execute();
+    }
+
 }

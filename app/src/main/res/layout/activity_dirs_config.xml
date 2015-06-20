@@ -43,6 +43,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
 
+                <TextView
+                    android:id="@+id/dirsUfo1Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="X-Com: Enemy Unknown"
+                    android:textSize="16dp" />
+                <TextView
+                    android:id="@+id/dirsUfo1Status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/dirsUfo1Label"
+                    android:text="Status:"/>
+                <Button
+                    android:id="@+id/dirsInstallFromDirButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Install from directory..."
+                    android:layout_below="@id/dirsUfo1Status"
+                    android:onClick="installButtonPress" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
                 <CheckBox
                     android:id="@+id/useDataCacheCheck"
                     android:layout_width="wrap_content"
@@ -53,7 +80,7 @@
                     android:id="@+id/TextView02"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/useDataCacheCheck"
+                    android:layout_below="@id/useDataCacheCheck"
                     android:text="@string/config_data_path" />
 
                 <EditText
@@ -71,6 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/dataPathEdit"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:onClick="dataButtonPress"
                     android:text="@string/config_browse_button" />
 
