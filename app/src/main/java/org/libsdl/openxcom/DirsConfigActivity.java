@@ -386,8 +386,13 @@ public class DirsConfigActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Log.i("DirsConfigActivity", "onActivityResult: got back from Preloader, passing execution to OpenXcom");
-		setResult(0, new Intent());
+        Log.i("DirsConfigActivity", "onActivityResult: got back from Preloader, passing execution to OpenXcom");
+        if (getCallingActivity() == null) {
+            Intent intent = new Intent(this, OpenXcom.class);
+            startActivity(intent);
+        } else {
+            setResult(0, new Intent());
+        }
 		finish();
 	}
 	

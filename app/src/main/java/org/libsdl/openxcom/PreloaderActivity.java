@@ -194,8 +194,14 @@ public class PreloaderActivity extends Activity {
 				finish();
 			}
 		} else {
-			Log.i(TAG, "Launching OpenXcom activity");
-			Intent intent = new Intent(this, OpenXcom.class);
+            Intent intent;
+            if (hasGameFiles()) {
+                Log.i(TAG, "Launching OpenXcom activity");
+                intent = new Intent(this, OpenXcom.class);
+            } else {
+                Log.i(TAG, "Couldn't find game files, launching DirsConfigActivity");
+                intent = new Intent(this, DirsConfigActivity.class);
+            }
 			startActivity(intent);
 		}
 	}
