@@ -265,6 +265,7 @@ public class DirsConfigActivity extends Activity {
 					dataPathText.setText(config.getDataFolderPath());
                     updateStatus();
 				}
+                invalidateAssets(false);
 			}
 		});
 		
@@ -436,7 +437,8 @@ public class DirsConfigActivity extends Activity {
 					pd.dismiss();
 				}
                 updateStatus();
-				Log.i("DirsConfigActivity", "Finishing asynctask...");	
+				Log.i("DirsConfigActivity", "Finishing asynctask...");
+                invalidateAssets(true);
 			}
 			
 		}.execute(inDir, outDir);
@@ -470,5 +472,22 @@ public class DirsConfigActivity extends Activity {
             }
         }.execute();
     }
+
+    /**
+     * Clears stored MD5 values for assets, effectively forcing unpacking again.
+     * @param patchOnly Invalidate only patch MD5
+     */
+	private void invalidateAssets(boolean patchOnly) {
+        final String INVALID = "INVALID";
+        config.setAssetVersion("9_ufo-patch.zip", INVALID);
+        if (!patchOnly) {
+            config.setAssetVersion("1_standard.zip", INVALID);
+            config.setAssetVersion("2_UFO.zip", INVALID);
+            config.setAssetVersion("3_TFTD.zip", INVALID);
+            config.setAssetVersion("7_translations", INVALID);
+            config.setAssetVersion("z_nomedia", INVALID);
+        }
+        config.save();
+	}
 
 }
