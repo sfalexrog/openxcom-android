@@ -32,6 +32,8 @@ public final class FilesystemHelper {
 		InputStream in_stream = new FileInputStream(in);
 		OutputStream out_stream = new FileOutputStream(out);
 		copyStream(in_stream, out_stream);
+		in_stream.close();
+		out_stream.close();
 	}
 	
 	/**
