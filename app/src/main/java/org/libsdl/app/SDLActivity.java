@@ -943,6 +943,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Keep track of the surface size to normalize touch events
     protected static float mWidth, mHeight;
 
+    // Workaround for right mouse button
+    SDLGenericMotionListener_API12 motionListener;
+
     // Startup    
     public SDLSurface(Context context) {
         super(context);
@@ -958,7 +961,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         
         if(Build.VERSION.SDK_INT >= 12) {
-            setOnGenericMotionListener(new SDLGenericMotionListener_API12());
+            motionListener = new SDLGenericMotionListener_API12();
+            setOnGenericMotionListener(motionListener);
         }
 
         // Some arbitrary defaults to avoid a potential division by zero
@@ -1050,7 +1054,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mWidth = width;
         mHeight = height;
         SDLActivity.onNativeResize(width, height, sdlFormat, mDisplay.getRefreshRate());
-        Log.v("SDL", "Window size:" + width + "x"+height);
+        Log.v("SDL", "Window size:" + width + "x" + height);
 
         // Set mIsSurfaceReady to 'true' *before* making a call to handleResume
         SDLActivity.mIsSurfaceReady = true;
@@ -1109,7 +1113,15 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                 }
             }
         }
-        
+
+        if( (event.getKeyCode() == KeyEvent.KEYCODE_BACK) && (event.getSource() & InputDevice.SOURCE_MOUSE) != 0) {
+            // fucking Samsung fucking devices
+            if (motionListener != null) {
+                SDLActivity.onNativeMouse(MotionEvent.BUTTON_SECONDARY, event.getAction(), motionListener.getMouseX(), motionListener.getMouseY());
+            }
+            return true;
+        }
+
         if( (event.getSource() & InputDevice.SOURCE_KEYBOARD) != 0) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 //Log.v("SDL", "key down: " + keyCode);
@@ -1524,6 +1536,13 @@ class SDLJoystickHandler_API12 extends SDLJoystickHandler {
 
 @SuppressLint("NewApi")
 class SDLGenericMotionListener_API12 implements View.OnGenericMotionListener {
+
+    // Workaround for Samsung devices treating right mouse button as a back button.
+    // Stored values for mouse X and Y.
+    private float mx, my;
+    public float getMouseX() {return mx;}
+    public float getMouseY() {return my;}
+
     // Generic Motion (mouse hover, joystick...) events go here
     @Override
     public boolean onGenericMotion(View v, MotionEvent event) {
@@ -1548,10 +1567,14 @@ class SDLGenericMotionListener_API12 implements View.OnGenericMotionListener {
                         return true;
 
                     case MotionEvent.ACTION_HOVER_MOVE:
-                        x = event.getX(0);
-                        y = event.getY(0);
-
-                        SDLActivity.onNativeMouse(0, action, x, y);
+                        mx = x = event.getX(0);
+                        my = y = event.getY(0);
+                        if (Build.VERSION.SDK_INT >= 14) {
+                            mouseButton = event.getButtonState();
+                        } else {
+                            mouseButton = 0;
+                        }
+                        SDLActivity.onNativeMouse(mouseButton, action, x, y);
                         return true;
 
                     default:
