@@ -7,6 +7,7 @@ import org.libsdl.openxcom.config.Config;
 import org.libsdl.openxcom.config.DataCheckResult;
 import org.libsdl.openxcom.config.DataChecker;
 import org.libsdl.openxcom.config.Xcom1DataChecker;
+import org.libsdl.openxcom.config.Xcom2DataChecker;
 import org.libsdl.openxcom.util.FilesystemHelper;
 
 import android.app.Activity;
@@ -65,6 +66,7 @@ public class DirsConfigActivity extends Activity {
 	public Context context;
 
 	private TextView xcom1Status;
+	private TextView xcom2Status;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,8 @@ public class DirsConfigActivity extends Activity {
 		confPathText = (EditText) findViewById(R.id.confPathEdit);
 
         xcom1Status = (TextView) findViewById(R.id.dirsUfo1Status);
+
+        xcom2Status = (TextView) findViewById(R.id.dirsUfo2Status);
 
 		// Prepare dialogs for showing
 		setupDialogs();
@@ -190,6 +194,12 @@ public class DirsConfigActivity extends Activity {
 	}
 
     public void installButtonPress(View view) {
+        checker = new Xcom1DataChecker();
+        installDialog.show();
+    }
+
+    public void installUfo2ButtonPress(View view) {
+        checker = new Xcom2DataChecker();
         installDialog.show();
     }
 	
@@ -427,7 +437,11 @@ public class DirsConfigActivity extends Activity {
                         File in = new File(arg0[0].getAbsolutePath() + "/" + dirName);
                         File out = new File(arg0[1].getAbsolutePath() + "/"
                                 + checker.getInstallDir() + "/" + dirName.toUpperCase());
-                        FilesystemHelper.copyFolder(in, out, true);
+						if (in.exists()) {
+							FilesystemHelper.copyFolder(in, out, true);
+						} else {
+							Log.w("OpenXcom", "[DirsAsyncTask] Couldn't find folder '" + dirName + "', your installation might be incomplete");
+						}
                     }
 				}
 				catch (Exception e) {
@@ -451,27 +465,35 @@ public class DirsConfigActivity extends Activity {
 
     private void updateStatus() {
         xcom1Status.setText("Status: checking...");
+        xcom2Status.setText("Status: checking...");
         new AsyncTask<Void, Void, Void>() {
             DataCheckResult result;
             Spanned resultDisplay;
+            Spanned result2Display;
 
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 xcom1Status.setText(resultDisplay);
+                xcom2Status.setText(result2Display);
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-                if (checker == null) {
-                    checker = new Xcom1DataChecker();
-                }
+                checker = new Xcom1DataChecker();
                 result = checker.checkWithPath(config.getDataFolderPath() + "/UFO");
                 if (result.isFound()) {
                     resultDisplay = Html.fromHtml("Status: <font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
 
                 } else {
                     resultDisplay = Html.fromHtml("Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
+                }
+                checker = new Xcom2DataChecker();
+                result = checker.checkWithPath(config.getDataFolderPath() + "/TFTD");
+                if (result.isFound()) {
+                    result2Display = Html.fromHtml("Status: <font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
+                } else {
+                    result2Display = Html.fromHtml("Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
                 }
                 return null;
             }

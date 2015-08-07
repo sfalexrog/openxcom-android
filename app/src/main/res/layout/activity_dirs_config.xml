@@ -4,15 +4,6 @@
     android:layout_height="match_parent"
     tools:context="${packageName}.${activityClass}" >
 
-    <TextView
-        android:id="@+id/textHelp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="8dp"
-        android:text="@string/config_help" />
-
     <Button
         android:id="@+id/buttonSave"
         android:layout_width="match_parent"
@@ -29,7 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/buttonSave"
-        android:layout_below="@id/textHelp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp" >
@@ -62,8 +52,31 @@
                     android:text="Install from directory..."
                     android:layout_below="@id/dirsUfo1Status"
                     android:onClick="installButtonPress" />
+            </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
+                <TextView
+                    android:id="@+id/dirsUfo2Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="X-Com: Terror From The Deep"
+                    android:textSize="16dp" />
+                <TextView
+                    android:id="@+id/dirsUfo2Status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/dirsUfo2Label"
+                    android:text="Status:"/>
+                <Button
+                    android:id="@+id/dirsInstallUfo2FromDirButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Install from directory..."
+                    android:layout_below="@id/dirsUfo2Status"
+                    android:onClick="installUfo2ButtonPress" />
             </RelativeLayout>
 
             <RelativeLayout
