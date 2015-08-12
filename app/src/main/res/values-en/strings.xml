@@ -14,7 +14,7 @@
     <string name="config_save_path">Path to save game folder</string>
     <string name="config_conf_path">Path to configuration files</string>
     <string name="config_finish">Save and restart</string>
-    
+
     <string name="daidalos_hello">Hello World!</string>
     <string name="daidalos_select">Select</string>
     <string name="daidalos_cancel">Cancel</string>

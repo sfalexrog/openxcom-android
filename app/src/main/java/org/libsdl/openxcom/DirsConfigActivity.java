@@ -38,7 +38,7 @@ import ar.com.daidalos.afiledialog.FileChooserDialog;
 
 
 public class DirsConfigActivity extends Activity {
-	
+
 	private Config config;
 
 	private CheckBox useAppCacheCheck;
@@ -206,10 +206,8 @@ public class DirsConfigActivity extends Activity {
 	// This prepares our dialog windows to be shown.
 	private void setupDialogs() {
 		AlertDialog.Builder copyDlgBuilder = new AlertDialog.Builder(this);
-		copyDlgBuilder.setTitle("Warning");
-		copyDlgBuilder.setMessage("You'll need to specify the path to game's data.\n"+
-								  "This data will be copied to the app's private storage.\n" +
-								  "Do you wish to proceed?");
+		copyDlgBuilder.setTitle(R.string.dirs_warning);
+		copyDlgBuilder.setMessage(getString(R.string.dirs_warn_copy_to_private_storage));
 		copyDlgBuilder.setCancelable(true);
 		copyDlgBuilder.setPositiveButton(android.R.string.yes,
 				new DialogInterface.OnClickListener() {
@@ -290,9 +288,9 @@ public class DirsConfigActivity extends Activity {
 			public void onFileSelected(Dialog source, File folder, String name) {
 				File saveFolder = new File(folder.getAbsolutePath() + "/" + name);
 				if (saveFolder.mkdir()) {
-					Toast.makeText(source.getContext(), "Successfuly created folder: " + saveFolder.getName(), Toast.LENGTH_LONG).show();
+					Toast.makeText(source.getContext(), getString(R.string.dirs_folder_create_success) + saveFolder.getName(), Toast.LENGTH_LONG).show();
 				} else {
-					Toast.makeText(source.getContext(), "Could not create folder: " + saveFolder.getName(), Toast.LENGTH_LONG).show();
+					Toast.makeText(source.getContext(), getString(R.string.dirs_folder_create_fail) + saveFolder.getName(), Toast.LENGTH_LONG).show();
 				}
 			}
 
@@ -316,9 +314,9 @@ public class DirsConfigActivity extends Activity {
 			public void onFileSelected(Dialog source, File folder, String name) {
 				File confFolder = new File(folder.getAbsolutePath() + "/" + name);
 				if (confFolder.mkdir()) {
-					Toast.makeText(source.getContext(), "Successfuly created folder: " + confFolder.getName(), Toast.LENGTH_LONG).show();
+					Toast.makeText(source.getContext(), getString(R.string.dirs_folder_create_success) + confFolder.getName(), Toast.LENGTH_LONG).show();
 				} else {
-					Toast.makeText(source.getContext(), "Could not create folder: " + confFolder.getName(), Toast.LENGTH_LONG).show();
+					Toast.makeText(source.getContext(), getString(R.string.dirs_folder_create_fail) + confFolder.getName(), Toast.LENGTH_LONG).show();
 				}
 			}
 
@@ -346,22 +344,22 @@ public class DirsConfigActivity extends Activity {
                 if (dcr.isFound()) {
                     AlertDialog ad = new AlertDialog.Builder(source.getContext())
                             .setCancelable(true)
-                            .setMessage("Are you sure you want to copy data from " + file.getAbsolutePath() + "?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            .setMessage(getString(R.string.dirs_data_copy_confirmation).replace("$path", file.getAbsolutePath()))
+                            .setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     source.hide();
                                     copyData(file, new File(config.getDataFolderPath()));
                                 }
                             })
-                            .setNegativeButton("No", null)
+                            .setNegativeButton(getString(android.R.string.no), null)
                             .show();
                 } else {
                     new AlertDialog.Builder(source.getContext())
                             .setCancelable(false)
-                            .setNeutralButton("OK", null)
-                            .setTitle("Warning")
-                            .setMessage("Could not find game data in this folder")
+                            .setNeutralButton(getString(android.R.string.ok), null)
+                            .setTitle(getString(R.string.dirs_warning))
+                            .setMessage(R.string.dirs_warn_no_data)
                             .show();
                 }
             }
@@ -416,8 +414,8 @@ public class DirsConfigActivity extends Activity {
 			@Override
 			protected void onPreExecute() {
 				pd = new ProgressDialog(context);
-				pd.setTitle("Copying X-Com data...");
-				pd.setMessage("Initializing...");
+				pd.setTitle(getString(R.string.dirs_copying_data));
+				pd.setMessage(getString(R.string.dirs_copy_init));
 				pd.setCancelable(false);
 				pd.setIndeterminate(true);
 				pd.show();
@@ -433,7 +431,7 @@ public class DirsConfigActivity extends Activity {
 				try {
 					Log.i("DirsAsyncTask", "Calling copyFolder...");
                     for(String dirName: checker.getDirChecklist()) {
-                        publishProgress("Copying " + dirName + "...");
+                        publishProgress(getString(R.string.dirs_copying) + dirName + "...");
                         File in = new File(arg0[0].getAbsolutePath() + "/" + dirName);
                         File out = new File(arg0[1].getAbsolutePath() + "/"
                                 + checker.getInstallDir() + "/" + dirName.toUpperCase());
@@ -464,8 +462,8 @@ public class DirsConfigActivity extends Activity {
 	}
 
     private void updateStatus() {
-        xcom1Status.setText("Status: checking...");
-        xcom2Status.setText("Status: checking...");
+        xcom1Status.setText(getString(R.string.dirs_status) + getString(R.string.dirs_status_checking));
+        xcom2Status.setText(getString(R.string.dirs_status) + getString(R.string.dirs_status_checking));
         new AsyncTask<Void, Void, Void>() {
             DataCheckResult result;
             Spanned resultDisplay;
@@ -483,17 +481,17 @@ public class DirsConfigActivity extends Activity {
                 checker = new Xcom1DataChecker();
                 result = checker.checkWithPath(config.getDataFolderPath() + "/UFO");
                 if (result.isFound()) {
-                    resultDisplay = Html.fromHtml("Status: <font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
+                    resultDisplay = Html.fromHtml(getString(R.string.dirs_status) + "<font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
 
                 } else {
-                    resultDisplay = Html.fromHtml("Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
+                    resultDisplay = Html.fromHtml(getString(R.string.dirs_status) + "Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
                 }
                 checker = new Xcom2DataChecker();
                 result = checker.checkWithPath(config.getDataFolderPath() + "/TFTD");
                 if (result.isFound()) {
-                    result2Display = Html.fromHtml("Status: <font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
+                    result2Display = Html.fromHtml(getString(R.string.dirs_status) + "<font color=\"#00FF00\">Version: " + result.getVersion() + " (" + result.getNotes() + ") </font>");
                 } else {
-                    result2Display = Html.fromHtml("Status: <font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
+                    result2Display = Html.fromHtml(getString(R.string.dirs_status) + "<font color=\"#FF0000\">Not found (" + result.getNotes() + ")</font>");
                 }
                 return null;
             }

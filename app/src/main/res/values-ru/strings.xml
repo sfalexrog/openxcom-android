@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">OpenXcom (beta)</string>
+    <string name="title_activity_preloader">PreloaderActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_dirs_config">DirsConfigActivity</string>
+
+    <string name="config_use_cache">Использовать кэш приложения для хранения данных (актуально для Android 4.4+)</string>
+    <string name="config_data_path">Путь к файлам данных:</string>
+    <string name="config_browse_button">Обзор</string>
+    <string name="config_use_cache_save">Хранить сохранения в кэше приложения</string>
+    <string name="config_use_cache_conf">Хранить настройки в кэше приложения</string>
+    <string name="config_save_path">Путь к сохранениям</string>
+    <string name="config_conf_path">Путь к файлам конфигурации</string>
+    <string name="config_finish">Сохранить и перезапустить</string>
+
+    <string name="daidalos_hello">Hello World!</string>
+    <string name="daidalos_select">Выбрать</string>
+    <string name="daidalos_cancel">Отмена</string>
+    <string name="daidalos_ok">OK</string>
+    <string name="daidalos_new_file">Создать</string>
+    <string name="daidalos_create_file">Создать файл</string>
+    <string name="daidalos_create_folder">Создать папку</string>
+    <string name="daidalos_accept">Принять</string>
+    <string name="daidalos_enter_file_name">Введите название создаваемого файла</string>
+    <string name="daidalos_enter_folder_name">Введите название создаваемой папки</string>
+    <string name="daidalos_yes">Да</string>
+    <string name="daidalos_no">Нет</string>
+    <string name="daidalos_confirm_select_file">Вы уверены, что хотите удалить \'$file_name\'?</string>
+    <string name="daidalos_confirm_create_file">Файла \'$file_name\' не существует, хотите ли его создать?</string>
+    <string name="daidalos_confirm_select_folder">Вы уверены, что хотите выбрать папку \'$file_name\'?</string>
+    <string name="daidalos_confirm_create_folder">Папка \'$file_name\' не существует, хотите ли её создать?</string>
+    <string name="daidalos_select_folder">Выбор папки</string>
+    <string name="dirs_warn_copy_to_private_storage">Вам надо будет указать путь к файлам игры.\nЭти файлы будут скопированы в приватный кэш приложения.\nВы хотите продолжить?</string>
+    <string name="dirs_warning">Внимание</string>
+    <string name="dirs_folder_create_success">"Папка успешно создана: "</string>
+    <string name="dirs_folder_create_fail">"Не удалось создать папку: "</string>
+    <string name="dirs_warn_no_data">Файлы игры в этой папке отсутствуют.</string>
+    <string name="dirs_data_copy_confirmation">"Вы уверены, что хотите скопировать данные из \'$path\'?"</string>
+    <string name="dirs_status">Статус: </string>
+    <string name="dirs_status_checking">проверяется…</string>
+    <string name="dirs_copying_data">Копирование файлов данных игры…</string>
+    <string name="dirs_copy_init">Инициализация…</string>
+    <string name="dirs_copying">"Копирование "</string>
+    <string name="dirs_install_from_dir">Скопировать UFO из папки…</string>
+    <string name="dirs_install_from_dir_xcom2">Скопировать TFTD из папки…</string>
+    <string name="preloader_title">Предзагрузка OpenXcom 1.0…</string>
+    <string name="preloader_init">Инициализация…</string>
+    <string name="preloader_assets_gen">Создание перечня архивов…</string>
+    <string name="preloader_extracting">"Распаковка "</string>
+
+    <color name="daidalos_gray">#888</color>
+    <color name="daidalos_backgroud">#000</color>
+    <color name="daidalos_active_file">#fff</color>
+    <color name="daidalos_inactive_file">#888</color>
+
+</resources>

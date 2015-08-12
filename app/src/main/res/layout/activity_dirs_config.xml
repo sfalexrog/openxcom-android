@@ -44,12 +44,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/dirsUfo1Label"
-                    android:text="Status:"/>
+                    android:text="@string/dirs_status"/>
                 <Button
                     android:id="@+id/dirsInstallFromDirButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Install from directory..."
+                    android:text="@string/dirs_install_from_dir"
                     android:layout_below="@id/dirsUfo1Status"
                     android:onClick="installButtonPress" />
             </RelativeLayout>
@@ -69,12 +69,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/dirsUfo2Label"
-                    android:text="Status:"/>
+                    android:text="@string/dirs_status"/>
                 <Button
                     android:id="@+id/dirsInstallUfo2FromDirButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Install from directory..."
+                    android:text="@string/dirs_install_from_dir_xcom2"
                     android:layout_below="@id/dirsUfo2Status"
                     android:onClick="installUfo2ButtonPress" />
             </RelativeLayout>

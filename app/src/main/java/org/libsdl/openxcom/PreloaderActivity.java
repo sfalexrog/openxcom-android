@@ -63,8 +63,8 @@ public class PreloaderActivity extends Activity {
             @Override
             protected void onPreExecute() {
                 pd = new ProgressDialog(context);
-                pd.setTitle("Pre-loading OpenXcom 1.0...");
-                pd.setMessage("Initializing...");
+                pd.setTitle(getString(R.string.preloader_title));
+                pd.setMessage(getString(R.string.preloader_init));
                 pd.setCancelable(false);
                 pd.setIndeterminate(true);
                 Log.i(TAG, "Updating game data...");
@@ -112,7 +112,7 @@ public class PreloaderActivity extends Activity {
                 }
 
                 // Get a list of baked-in assets
-                publishProgress("Generating a list of assets...");
+                publishProgress(getString(R.string.preloader_assets_gen));
                 try {
                     for (String assetName : assets.list("")) {
                         assetContents.add(assetName);
@@ -141,7 +141,7 @@ public class PreloaderActivity extends Activity {
                             version = "undefined";
                         }
                         if (!version.equals(currentVersion)) {
-                            publishProgress("Extracting " + archiveName);
+                            publishProgress(getString(R.string.preloader_extracting) + archiveName);
                             Log.i(TAG, "Extracting " + archiveName + " to " + config.getDataFolderPath());
                             try {
                                 FilesystemHelper.zipExtract(assets.open(archiveName), new File(config.getDataFolderPath()));
