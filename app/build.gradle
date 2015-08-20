@@ -18,6 +18,9 @@ if (System.properties['os.name'].toLowerCase().contains('windows')) {
     ext.ndkBin = 'ndk-build'
 }
 
+def git = org.ajoberstar.grgit.Grgit.open(file('..'))
+ext.revision = git.head().getAbbreviatedId(7)
+
 android {
     compileSdkVersion 22
     buildToolsVersion "21.1.2"
@@ -39,6 +42,14 @@ android {
                 storePassword project.signing.storePassword
                 keyAlias project.signing.keyAlias
                 keyPassword project.signing.keyPassword
+
+                applicationVariants.all { variant ->
+                    variant.outputs.each { output ->
+                        output.outputFile = new File(output.outputFile.parent,
+                                    output.outputFile.name.replace("app-release",
+                                        "OpenXcom-v1.0-g${project.revision}"))
+                    }
+                }
             }
         }
         buildTypes {
@@ -109,7 +120,6 @@ task packBin(description: 'Update data files.') {
     zipTranslations.destinationDir = file('src/main/assets')
     zipTranslations.archiveName = '7_translations.zip'
     zipTranslations.from getFolder('translations/output')
-    //zipTranslations.into 'standard/xcom1/Language'
     zipTranslations.execute()
 }
 
