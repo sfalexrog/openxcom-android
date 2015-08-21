@@ -1225,10 +1225,11 @@ public class Xcom2DataChecker implements DataChecker {
         for (String subpath: CommonDirs) {
             File subDir = new File(path + "/" + subpath);
             if (!subDir.exists()) {
-                if ((!subpath.equals(CinematicDir)) || (!subpath.equals(SlideshowDir))) {
-                    return new DataCheckResult(false, "(null)", "Incomplete installation");
-                } else {
+                if (subpath.equals(CinematicDir) || subpath.equals(SlideshowDir)) {
                     Log.w("DataChecker", "[Xcom2DataChecker] Couldn't find '" + subpath + "', some features will be unavailable");
+                    continue;
+                } else {
+                    return new DataCheckResult(false, "(null)", "Incomplete installation");
                 }
             }
             String[] subList = subDir.list();
