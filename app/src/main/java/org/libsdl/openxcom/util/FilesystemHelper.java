@@ -35,6 +35,25 @@ public final class FilesystemHelper {
 		in_stream.close();
 		out_stream.close();
 	}
+
+	/**
+	 * Creates a copy of the file, ensuring the file is written to the disk
+	 * @param in Source file
+	 * @param out Destination file
+	 * @throws IOException if the operation fails
+	 */
+	public static void copyFileSync(File in, File out) throws IOException {
+		FileInputStream inStream = new FileInputStream(in);
+		FileOutputStream outStream = new FileOutputStream(out);
+		try {
+			copyStream(inStream, outStream);
+		} finally {
+			inStream.close();
+			outStream.flush();
+			outStream.getFD().sync();
+			outStream.close();
+		}
+	}
 	
 	/**
 	 * Copies inputStream to outputStream in a somewhat buffered way
@@ -81,7 +100,7 @@ public final class FilesystemHelper {
 			} else {
 				File out_file = new File(out_folder.getAbsolutePath() + "/" + in_file.getName());
 				Log.i("FileHelper", "Source: " + in_file.getPath() + "; Destination: " + out_file.getPath());
-				copyFile(in_file, out_file);
+				copyFileSync(in_file, out_file);
 			}
 			
 			

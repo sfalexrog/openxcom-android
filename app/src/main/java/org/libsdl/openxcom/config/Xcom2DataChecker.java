@@ -1233,11 +1233,13 @@ public class Xcom2DataChecker implements DataChecker {
                 }
             }
             String[] subList = subDir.list();
-            ArrayList<String> subListLower = new ArrayList<>(subList.length);
-            for (String subElem: subList) {
-                subListLower.add(subElem.toLowerCase());
+            if (subList != null) { // WHY does this even happen?!
+                ArrayList<String> subListLower = new ArrayList<>(subList.length);
+                for (String subElem: subList) {
+                    subListLower.add(subElem.toLowerCase());
+                }
+                contents.addAll(subListLower);
             }
-            contents.addAll(subListLower);
         }
 
         String versionDescription = "";
