@@ -14,6 +14,7 @@ before_install:
   - export ANDROID_HOME=$(pwd)/android-sdk-linux
   - export ANDROID_NDK=$(pwd)/android-ndk-r10e
   - printf "sdk.dir=$ANDROID_HOME\nndk.dir=$ANDROID_NDK" > local.properties
+  - chmod +x gradlew
 android:
   components:
     - build-tools-21.1.2
