@@ -17,4 +17,4 @@ before_install:
 android:
   components:
     - build-tools-21.1.2
-    - android-19
+    - android-22
