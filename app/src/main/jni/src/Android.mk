@@ -27,7 +27,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 
 LOCAL_ARM_MODE := arm
 
-OPENXCOM_VERSION := $(shell git -C $(LOCAL_PATH) describe | sed 's/.*-/-/' | sed 's/.*/\\\"&\\\"/')
+OPENXCOM_VERSION := $(shell git -C $(OPENXCOM_PATH) rev-parse --short HEAD | sed 's/.*-/-/' | sed 's/.*/\\\"&\\\"/')
 
 LOCAL_CFLAGS += -DOPENXCOM_VERSION_GIT="$(OPENXCOM_VERSION)" -D__MOBILE__
 
