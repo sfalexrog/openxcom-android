@@ -2,7 +2,7 @@ language: android
 before_install:
   - sudo apt-get clean
   - sudo apt-get update -qq
-  - sudo apt-get install -qq --force-yes ia32-libs ia32-libs-multiarch p7zip
+#  - sudo apt-get install -qq --force-yes ia32-libs ia32-libs-multiarch p7zip
   - wget --timeout=120 http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86.bin -O ndk.bin
   - md5sum ndk.bin | grep c3edd3273029da1cbd2f62c48249e978
   - 7zr x ndk.bin
