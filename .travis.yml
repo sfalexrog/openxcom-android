@@ -9,7 +9,7 @@ addons:
      - p7zip-full
 before_install:
   - wget --timeout=120 http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin -O ndk.bin
-  - md5sum ndk.bin | grep c3edd3273029da1cbd2f62c48249e978
+  - md5sum ndk.bin | grep 19af543b068bdb7f27787c2bc69aba7f
   - 7z x ndk.bin > /dev/null
   - export ANDROID_NDK=$(pwd)/android-ndk-r10e
   - printf "ndk.dir=$ANDROID_NDK" > local.properties
