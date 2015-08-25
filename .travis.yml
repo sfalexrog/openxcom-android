@@ -3,10 +3,12 @@ sudo: false
 addons:
   apt:
     packages:
-#     - libgd2-xpm
-#     - ia32-libs
-#     - ia32-libs-multiarch
      - p7zip-full
+env:
+  - BUILD_ARCH_LIST='armeabi'
+  - BUILD_ARCH_LIST='armeabi-v7a'
+  - BUILD_ARCH_LIST='x86'
+  - BUILD_ARCH_LIST='x86_64'
 before_install:
   - wget --timeout=120 http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin -O ndk.bin
   - md5sum ndk.bin | grep 19af543b068bdb7f27787c2bc69aba7f
