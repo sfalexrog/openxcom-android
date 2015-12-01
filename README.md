@@ -8,7 +8,7 @@ This project contains parts of the Boost library required to build yaml-cpp libr
 
 Uses [afiledialog](https://github.com/jfmdev/afiledialog) library.
 
-# Building
+# Building [![Build Status](https://travis-ci.org/sfalexrog/openxcom-android.svg?branch=master)](https://travis-ci.org/sfalexrog/openxcom-android)
 
 In order to build OpenXcom for Android, you'll need:
 
