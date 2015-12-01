@@ -27,9 +27,9 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 
 LOCAL_ARM_MODE := arm
 
-OPENXCOM_VERSION := $(shell git -C $(LOCAL_PATH)/$(OPENXCOM_PATH) rev-parse --short HEAD | sed 's/.*-/-/' | sed 's/.*/\\\"&\\\"/')
+OPENXCOM_VERSION := $(shell git -C $(LOCAL_PATH)/$(OPENXCOM_PATH) rev-parse --short HEAD)
 
-LOCAL_CFLAGS += -DOPENXCOM_VERSION_GIT="$(OPENXCOM_VERSION)" -D__MOBILE__
+LOCAL_CFLAGS += -DOPENXCOM_VERSION_GIT="\"-g$(OPENXCOM_VERSION)\"" -D__MOBILE__
 
 # Disable OpenGL renderer
 
@@ -54,17 +54,18 @@ LOCAL_SRC_FILES := SDL_android_main.c \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Engine/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Engine/Adlib/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Engine/Scalers/*.cpp) \
+	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Engine/EGLContext/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Geoscape/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Interface/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Menu/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Resource/*.cpp) \
-	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Ruleset/*.cpp) \
+	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Mod/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Savegame/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/$(OPENXCOM_PATH)/src/Ufopaedia/*.cpp))
 
 LOCAL_STATIC_LIBRARIES := SDL2_static SDL2_image SDL2_mixer SDL_gfx
 
-LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -llog
+LOCAL_LDLIBS := -lEGL -lGLESv2 -llog
 
 LOCAL_EXPORT_LDLIBS := -lSDL2
 
