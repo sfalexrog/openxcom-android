@@ -212,7 +212,7 @@ public class PreloaderActivity extends Activity {
 	 */
 	protected boolean hasGameFiles() {
         try {
-            ZipInputStream ufo1zip = new ZipInputStream(assets.open("3_UFO.zip"));
+            ZipInputStream ufo1zip = new ZipInputStream(assets.open("2_UFO.zip"));
             ZipEntry ze = ufo1zip.getNextEntry();
             while (ze != null) {
                 if(ze.getName().equals("UFO/TERRAIN/UFO1.PCK")) {
@@ -221,7 +221,7 @@ public class PreloaderActivity extends Activity {
                 ze = ufo1zip.getNextEntry();
             }
         } catch (IOException e) {
-            Log.w(TAG, "Could not open 3_UFO.zip; did you package your files correctly?");
+            Log.w(TAG, "Could not open 2_UFO.zip; did you package your files correctly?");
         }
         return new File(config.getDataFolderPath() + "/UFO/TERRAIN/UFO1.PCK").exists();
 	}
