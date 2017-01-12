@@ -7,12 +7,18 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -31,6 +37,9 @@ public class PreloaderActivity extends Activity {
 	
 	private Config config;
 
+    private static final int REQUEST_WRITE_STORAGE = 112;
+    private boolean hasWritePermission = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         config = Config.createInstance(this);
@@ -39,6 +48,13 @@ public class PreloaderActivity extends Activity {
 		context = this;
 		preloaderLog = (TextView) findViewById(R.id.preloaderLog);
 		assets = getAssets();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            hasWritePermission = true;
+        } else {
+            hasWritePermission =
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                            PackageManager.PERMISSION_GRANTED;
+        }
 	}
 	
 	@Override
@@ -56,6 +72,49 @@ public class PreloaderActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasWritePermission) {
+            requestWriteStorage();
+        } else {
+            unpackData();
+        }
+    }
+
+    @TargetApi(23)
+    private void requestWriteStorage()
+    {
+        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                REQUEST_WRITE_STORAGE);
+    }
+
+    @TargetApi(23)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    unpackData();
+                } else {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        AlertDialog dialog = new AlertDialog.Builder(this)
+                                .setMessage("This game operates on external data. It cannot function otherwise.")
+                                .setTitle("Permission required")
+                                .setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        requestWriteStorage();
+                                    }
+                                })
+                                .create();
+                        dialog.show();
+                    }
+                }
+        }
+    }
+
+    private void unpackData() {
         new AsyncTask<Void, String, Void>()
         {
             Set<String> assetContents;
