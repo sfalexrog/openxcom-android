@@ -12,26 +12,38 @@ if (file('signing.gradle').exists()) {
     apply from: 'signing.gradle'
 }
 
-if (System.properties['os.name'].toLowerCase().contains('windows')) {
-    ext.ndkBin = 'ndk-build.cmd'
-} else {
-    ext.ndkBin = 'ndk-build'
-}
-
 def git = org.ajoberstar.grgit.Grgit.open(file('..'))
 ext.revision = git.head().getAbbreviatedId(7)
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "25.0.1"
+
+    externalNativeBuild {
+        /*ndkBuild {
+            path "src/main/jni/Android.mk"
+        }*/
+        cmake {
+            path "src/main/jni/CMakeLists.txt"
+        }
+    }
 
     defaultConfig {
         applicationId "org.libsdl.openxcom"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
 
-        ndk {
-            moduleName "main"
+        externalNativeBuild {
+            /*ndkBuild {
+                arguments "-j8", "NDK_APPLICATION_MK:=src/main/jni/Application.mk"
+                //abiFilters "armeabi", "armeabi-v7a", "x86", "x86_64", "arm64-v8a", "mips"
+                abiFilters "armeabi-v7a"
+            }*/
+            cmake {
+                arguments "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm", "-DOPENXCOM_VERSION_STRING=${project.revision}"
+                abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
+                cppFlags "-std=c++11", "-fexceptions", "-frtti"
+            }
         }
     }
 
@@ -55,26 +67,15 @@ android {
         buildTypes {
             release {
                 signingConfig signingConfigs.release
+                externalNativeBuild {
+                    cmake {
+                        cFlags "-O3", "-ffast-math"
+                        cppFlags "-O3", "-ffast-math"
+                    }
+
+                }
             }
         }
-    }
-
-    sourceSets.main {
-        jniLibs.srcDir 'src/main/libs'
-        jni.srcDirs = []
-    }
-
-    task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
-        def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir/$ndkBin", "-C", file('src/main/jni').absolutePath,
-                '-j' + Runtime.runtime.availableProcessors(),
-                'all'
-    }
-
-    task cleanNative(type: Exec, description: 'Clean JNI object files') {
-        def ndkDir = plugins.getPlugin('com.android.application').sdkHandler.getNdkFolder()
-        commandLine "$ndkDir/$ndkBin", '-C', file('src/main/jni').absolutePath,
-                'clean'
     }
 
     tasks.withType(Zip) {
@@ -82,12 +83,6 @@ android {
             task.doLast {
                 ant.checksum file: it.archivePath, algorithm: "MD5"
             }
-    }
-
-    clean.dependsOn 'cleanNative'
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn buildNative
     }
 
     buildTypes {

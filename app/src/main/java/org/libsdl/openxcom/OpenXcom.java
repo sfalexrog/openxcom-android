@@ -117,6 +117,12 @@ public class OpenXcom extends SDLActivity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 	}
 
+	@Override
+	protected String[] getLibraries() {
+		return new String[] {
+				"openxcom"
+		};
+	}
 }
 
 
