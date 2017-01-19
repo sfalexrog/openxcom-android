@@ -69,5 +69,5 @@ target_include_directories(SDL2_mixer PRIVATE
 set_target_properties(SDL2_mixer
     PROPERTIES
     COMPILE_FLAGS
-    "-DOGG_MUSIC -DOGG_USE_TREMOR\
+    "-DOGG_MUSIC -DOGG_USE_TREMOR -DOGG_HEADER=\"<ivorbisfile.h>\"\
     -DWAV_MUSIC")
