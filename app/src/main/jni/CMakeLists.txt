@@ -13,14 +13,24 @@
 # Android Studio seems to use this version
 cmake_minimum_required(VERSION 3.4.1)
 
+project(OPENXCOM CXX)
+
+set(SDL_PATH SDL)
+set(SDL2_IMAGE_PATH SDL2_image)
+set(SDL2_MIXER_PATH SDL2_mixer)
+set(SDL_GFX_PATH SDL_gfx)
+set(YAML_CPP_PATH yaml-cpp)
+set(LIBMAD_PATH libmad-0.15.1b)
+
+set(LIBRARIES_BUILD_TYPE STATIC)
+
 # Build prerequisites first (yeah, by including whole files)
 include(deps_cmake/sdl.cmake)
 include(deps_cmake/sdl2_image.cmake)
+include(deps_cmake/libmad.cmake)
 include(deps_cmake/sdl2_mixer.cmake)
 include(deps_cmake/sdl_gfx.cmake)
 include(deps_cmake/yaml-cpp.cmake)
-
-project(OPENXCOM CXX)
 
 #file(GLOB OPENXCOM_FILES_BASE
 #    OpenXcom/src/*.cpp)
