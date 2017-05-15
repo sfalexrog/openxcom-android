@@ -5,77 +5,73 @@
 # THIS FILE IS AS BAD AS IT GETS, IT ASSUMES IT'S INCLUDED
 # IN THE TOP-LEVEL PROJECT AS IS, DON'T DO THAT KIDS
 
-cmake_minimum_required(VERSION 3.4.0)
-
-project(SDL2 C)
-
 file(GLOB SDL_FILES_BASE
-    SDL/src/*.c)
+    ${SDL_PATH}/src/*.c)
 
 file(GLOB SDL_FILES_ATOMIC
-        SDL/src/atomic/*.c)
+        ${SDL_PATH}/src/atomic/*.c)
 
 file(GLOB SDL_FILES_AUDIO
-        SDL/src/audio/*.c
-        SDL/src/audio/dummy/*.c
-        SDL/src/audio/android/*.c)
+        ${SDL_PATH}/src/audio/*.c
+        ${SDL_PATH}/src/audio/dummy/*.c
+        ${SDL_PATH}/src/audio/android/*.c)
 
 file(GLOB SDL_FILES_CORE
-        SDL/src/core/android/*.c)
+        ${SDL_PATH}/src/core/android/*.c)
 
 file(GLOB SDL_FILES_CPUINFO
-        SDL/src/cpuinfo/*.c)
+        ${SDL_PATH}/src/cpuinfo/*.c)
 
 file(GLOB SDL_FILES_DYNAPI
-        SDL/src/dynapi/*.c)
+        ${SDL_PATH}/src/dynapi/*.c)
 
 file(GLOB SDL_FILES_EVENTS
-        SDL/src/events/*.c)
+        ${SDL_PATH}/src/events/*.c)
 
 file(GLOB SDL_FILES_FILE
-        SDL/src/file/*.c)
+        ${SDL_PATH}/src/file/*.c)
 
 file(GLOB SDL_FILES_FILESYSTEM
-        SDL/src/filesystem/android/*.c)
+        ${SDL_PATH}/src/filesystem/android/*.c)
 
 file(GLOB SDL_FILES_HAPTIC
-        SDL/src/haptic/*.c
-        SDL/src/haptic/dummy/*.c)
+        ${SDL_PATH}/src/haptic/*.c
+        ${SDL_PATH}/src/haptic/dummy/*.c)
 
 file(GLOB SDL_FILES_JOYSTICK
-        SDL/src/joystick/*.c
-        SDL/src/joystick/android/*.c)
+        ${SDL_PATH}/src/joystick/*.c
+        ${SDL_PATH}/src/joystick/android/*.c)
 
 file(GLOB SDL_FILES_LOADSO
-        SDL/src/loadso/dlopen/*.c)
+        ${SDL_PATH}/src/loadso/dlopen/*.c)
 
 file(GLOB SDL_FILES_POWER
-        SDL/src/power/*.c
-        SDL/src/power/android/*.c)
+        ${SDL_PATH}/src/power/*.c
+        ${SDL_PATH}/src/power/android/*.c)
 
 file(GLOB SDL_FILES_RENDER
-        SDL/src/render/*.c
-        SDL/src/render/opengles/*.c
-        SDL/src/render/opengles2/*.c
-        SDL/src/render/software/*.c)
+        ${SDL_PATH}/src/render/*.c
+        ${SDL_PATH}/src/render/opengles/*.c
+        ${SDL_PATH}/src/render/opengles2/*.c
+        ${SDL_PATH}/src/render/software/*.c)
 
 file(GLOB SDL_FILES_STDLIB
-        SDL/src/stdlib/*.c)
+        ${SDL_PATH}/src/stdlib/*.c)
 
 file(GLOB SDL_FILES_TEST
-        SDL/src/test/*.c)
+        ${SDL_PATH}/src/test/*.c)
 
 file(GLOB SDL_FILES_THREAD
-        SDL/src/thread/*.c
-        SDL/src/thread/pthread/*.c)
+        ${SDL_PATH}/src/thread/*.c
+        ${SDL_PATH}/src/thread/pthread/*.c)
 
 file(GLOB SDL_FILES_TIMER
-        SDL/src/timer/*.c
-        SDL/src/timer/unix/*.c)
+        ${SDL_PATH}/src/timer/*.c
+        ${SDL_PATH}/src/timer/unix/*.c)
 
 file(GLOB SDL_FILES_VIDEO
-        SDL/src/video/*.c
-        SDL/src/video/android/*.c)
+        ${SDL_PATH}/src/video/*.c
+        ${SDL_PATH}/src/video/android/*.c)
 
 
 set(SDL_SOURCES
@@ -107,7 +103,7 @@ find_library(ANDROID_LIB android)
 find_library(DL_LIB dl)
 
 add_library(SDL2
-            STATIC
+            ${LIBRARIES_BUILD_TYPE}
             ${SDL_SOURCES})
 
 target_link_libraries(SDL2
@@ -119,6 +115,6 @@ target_link_libraries(SDL2
         )
 
 target_include_directories(SDL2 PUBLIC
-        SDL/include)
+        ${SDL_PATH}/include)
 
 set_target_properties(SDL2 PROPERTIES COMPILE_FLAGS "-DGL_GLEXT_PROTOTYPES")

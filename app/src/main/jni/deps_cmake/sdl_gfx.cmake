@@ -1,9 +1,6 @@
-cmake_minimum_required(VERSION 3.4.0)
-
-project(SDL_gfx C)
 
 file(GLOB SDL_gfx_BASE
-    SDL_gfx/*.c
+    ${SDL_GFX_PATH}/*.c
 )
 
 set(SDL_gfx_SOURCES
@@ -11,7 +8,7 @@ set(SDL_gfx_SOURCES
     )
 
 add_library(SDL_gfx
-            STATIC
+            ${LIBRARIES_BUILD_TYPE}
             ${SDL_gfx_SOURCES})
 
 target_link_libraries(SDL_gfx
