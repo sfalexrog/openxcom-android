@@ -1,28 +1,22 @@
 // Dummy values
 ext.signing = [
-        enabled       : false,
-        storeFilePath : '.keystore',
-        storePassword : 'password',
-        keyAlias      : 'alias',
-        keyPassword   : 'password',
+        enabled      : false,
+        storeFilePath: '.keystore',
+        storePassword: 'password',
+        keyAlias     : 'alias',
+        keyPassword  : 'password',
 ]
-
 apply plugin: 'com.android.application'
 if (file('signing.gradle').exists()) {
     apply from: 'signing.gradle'
 }
-
 def git = org.ajoberstar.grgit.Grgit.open(file('..'))
 ext.revision = git.head().getAbbreviatedId(7)
-
 android {
-    compileSdkVersion 23
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     externalNativeBuild {
-        /*ndkBuild {
-            path "src/main/jni/Android.mk"
-        }*/
         cmake {
             path "src/main/jni/CMakeLists.txt"
         }
@@ -31,16 +25,13 @@ android {
     defaultConfig {
         applicationId "org.libsdl.openxcom"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
 
         externalNativeBuild {
-            /*ndkBuild {
-                arguments "-j8", "NDK_APPLICATION_MK:=src/main/jni/Application.mk"
-                //abiFilters "armeabi", "armeabi-v7a", "x86", "x86_64", "arm64-v8a", "mips"
-                abiFilters "armeabi-v7a"
-            }*/
             cmake {
-                arguments "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm",
+                arguments "-DANDROID_UNIFIED_HEADERS=ON",
+                        "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm",
+                        "-DANDROID_ARM_NEON=TRUE",
                         "-DOPENXCOM_VERSION_STRING=-g${project.revision}",
                         "-DANDROID_PLATFORM=android-9"
                 abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
@@ -60,7 +51,7 @@ android {
                 applicationVariants.all { variant ->
                     variant.outputs.each { output ->
                         output.outputFile = new File(output.outputFile.parent,
-                                    output.outputFile.name.replace("app-release",
+                                output.outputFile.name.replace("app-release",
                                         "OpenXcom-v1.0-g${project.revision}"))
                     }
                 }
@@ -71,8 +62,9 @@ android {
                 signingConfig signingConfigs.release
                 externalNativeBuild {
                     cmake {
-                        cFlags "-O3", "-ffast-math"
-                        cppFlags "-O3", "-ffast-math"
+                        cFlags "-O3", "-ffast-math", "-flto"
+                        cppFlags "-O3", "-ffast-math", "-flto"
+
                     }
 
                 }
@@ -92,14 +84,18 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+        debugJava {
+            debuggable true
+            jniDebuggable false
+            minifyEnabled false
+            zipAlignEnabled true
+        }
     }
 }
-
 def getFolder(resource) {
     def binDir = file('src/main/jni/OpenXcom/bin/' + resource);
     return binDir;
 }
-
 task packBin(description: 'Update data files.') {
     def index = 0;
     ['common', 'standard', 'UFO', 'TFTD'].each { String res ->
@@ -113,7 +109,7 @@ task packBin(description: 'Update data files.') {
         index++;
     }
     def zipTranslations = task("zipTranslations", type: Zip)
-    zipTranslations.doFirst { println('Packing translations...' )}
+    zipTranslations.doFirst { println('Packing translations...') }
     zipTranslations.destinationDir = file('src/main/assets')
     zipTranslations.archiveName = '7_translations.zip'
     zipTranslations.from getFolder('translations/output')
