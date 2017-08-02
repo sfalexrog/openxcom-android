@@ -64,7 +64,7 @@ android {
                     variant.outputs.each { output ->
                         output.outputFile = new File(output.outputFile.parent,
                                 output.outputFile.name.replace("app-release",
-                                        "OpenXcom-v1.0-g${project.revision}"))
+                                        "OpenXcom-v1.0-g${project.revision}-${buildArchList.join('_')}"))
                     }
                 }
             }
