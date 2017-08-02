@@ -18,6 +18,8 @@ before_install:
   - 7z x ndk.zip > /dev/null
   - export ANDROID_NDK=$(pwd)/android-ndk-r15c
   - printf "ndk.dir=$ANDROID_NDK" > local.properties
+after_success:
+  - ls -laR app/build/outputs
 android:
   components:
     - tools
