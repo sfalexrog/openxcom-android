@@ -62,8 +62,8 @@ android {
                 signingConfig signingConfigs.release
                 externalNativeBuild {
                     cmake {
-                        cFlags "-O3", "-ffast-math", "-flto"
-                        cppFlags "-O3", "-ffast-math", "-flto"
+                        cFlags "-O3", "-ffast-math"
+                        cppFlags "-O3", "-ffast-math"
 
                     }
 
