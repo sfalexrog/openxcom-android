@@ -4,8 +4,6 @@ OpenXcom for Android is, as the name suggests, a port of [OpenXcom](http://openx
 Android platform. In order to achieve this, it uses SDL2 set of libraries, and a portion of Java
 code for some convenient features like auto-updating files after installing new version.
 
-This project contains parts of the Boost library required to build yaml-cpp library.
-
 Uses [afiledialog](https://github.com/jfmdev/afiledialog) library.
 
 # Building [![Build Status](https://travis-ci.org/sfalexrog/openxcom-android.svg?branch=master)](https://travis-ci.org/sfalexrog/openxcom-android)
@@ -13,10 +11,10 @@ Uses [afiledialog](https://github.com/jfmdev/afiledialog) library.
 In order to build OpenXcom for Android, you'll need:
 
  - A current Android SDK, and
- - A current Android NDK (tested with r10e).
+ - A current Android NDK (tested with r15c).
 
-Additionally, you'll need Java development kit and Java runtime environment version 1.7
-(Oracle Java SE 7 or OpenJDK 7), which is required for building Android applications.
+Additionally, you'll need Java development kit and Java runtime environment version 1.8
+(OpenJDK 8 seems to be preferred, although you could probably get by with Oracle JDK 8), which is required for building Android applications.
 
 Ideally, you should install Android Studio and try building some basic projects. If everything works,
 then it should work just fine with this project.
@@ -48,7 +46,7 @@ or
     $ git submodule init
     $ git sibmodule update
 
-3. Since this project uses Android NDK (currently built with r10e), you'll need to provide path
+3. Since this project uses Android NDK (currently built with r15c), you'll need to provide path
 to it. Additionally, you'll have to provide path to Android SDK as well. These paths should be in
 the local.properties file in the project root. The file should contain the following lines:
 
@@ -57,6 +55,10 @@ the local.properties file in the project root. The file should contain the follo
     ndk.dir=/path/to/Android/ndk
 
 with your own actual paths substituted instead of these placeholders.
+
+Note that gradle will attempt to install all dependencies (except for ndk for some reason) if you're missing some of them.
+You'll need to have licenses for them, however. In order to get those licenses, run `${ANDROID_SDK}/tools/bin/sdkmanager --licenses`
+and accept at least the `android-sdk-license`.
 
 # Building the app
 
@@ -114,8 +116,9 @@ OpenXcom Extended as an example):
 
 # Caveats
 
-This project uses ndk-build system, which is marked as "deprecated" by Google (even though there's
-no alternative as of time of me writing this). Still, expect changes to the build system.
+This project uses Google's modified cmake to build native code. It's installed automatically through gradle
+(if you have the `android-sdk-license`, at least), but it might not work on some distributions due to its reliance
+on a particular version of OpenSSL. Seems to work just fine on Ubuntu, required a custom build of OpenSSL on Fedora. YMMV.
 
 I'm no expert in Gradle build system, so most of the code is not very good. Anyway, it seems to work,
 and I'm not touching it anytime soon.
