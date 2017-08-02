@@ -10,8 +10,20 @@ apply plugin: 'com.android.application'
 if (file('signing.gradle').exists()) {
     apply from: 'signing.gradle'
 }
+
 def git = org.ajoberstar.grgit.Grgit.open(file('..'))
 ext.revision = git.head().getAbbreviatedId(7)
+
+def buildArchEnv = System.getenv()['BUILD_ARCH_LIST']
+
+def buildArchList = new ArrayList<String>()
+
+if (!buildArchEnv) {
+    buildArchList.addAll(["armeabi-v7a", "x86", "x86_64", "arm64-v8a"])
+} else {
+    buildArchList.addAll(buildArchEnv.split(":"))
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -34,7 +46,7 @@ android {
                         "-DANDROID_ARM_NEON=TRUE",
                         "-DOPENXCOM_VERSION_STRING=-g${project.revision}",
                         "-DANDROID_PLATFORM=android-9"
-                abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
+                abiFilters.addAll(buildArchList)
                 cppFlags "-std=c++11", "-fexceptions", "-frtti"
             }
         }
@@ -64,9 +76,7 @@ android {
                     cmake {
                         cFlags "-O3", "-ffast-math"
                         cppFlags "-O3", "-ffast-math"
-
                     }
-
                 }
             }
         }
