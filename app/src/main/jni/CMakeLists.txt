@@ -120,5 +120,30 @@ set_target_properties(openxcom
 #    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -flto")
 #endif()
 
+# Taken from OpenXcom cmake
+if ( "${OPENXCOM_VERSION_STRING}" STREQUAL "" )
+  find_package ( Git )
+  if ( GIT_FOUND )
+    message("git found: ${GIT_EXECUTABLE}")
+    execute_process ( COMMAND ${GIT_EXECUTABLE} describe --dirty
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE git_describe_out
+      ERROR_VARIABLE git_describe_error
+      RESULT_VARIABLE git_describe_result
+      )
+    string ( REGEX MATCH "([a-z|0-9|.]*)-([0-9]*)-g([a-z|0-9]*)([-|a-z]*)" git_commit "${git_describe_out}" )
+    set ( git_tag ${CMAKE_MATCH_1} )
+    set ( git_nb_commit ${CMAKE_MATCH_2} )
+    set ( git_commit ${CMAKE_MATCH_3} )
+    set ( git_dirty ${CMAKE_MATCH_4} )
+    set ( OPENXCOM_VERSION_STRING ".${git_commit}${git_dirty}" )
+  else()
+# Well, just set the version string to a somewhat sensible default
+    set ( OPENXCOM_VERSION_STRING ".nogit-dev" )
+  endif()
+endif()
+
+add_definitions( -DGIT_BUILD=1 )
+
 configure_file("OpenXcom/src/git_version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/git_version.h" )
 include_directories ( "${CMAKE_CURRENT_BINARY_DIR}" )

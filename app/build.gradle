@@ -44,7 +44,6 @@ android {
                 arguments "-DANDROID_UNIFIED_HEADERS=ON",
                         "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm",
                         "-DANDROID_ARM_NEON=TRUE",
-                        "-DOPENXCOM_VERSION_STRING=-g${project.revision}",
                         "-DANDROID_PLATFORM=android-9"
                 abiFilters.addAll(buildArchList)
                 cppFlags "-std=c++11", "-fexceptions", "-frtti"
