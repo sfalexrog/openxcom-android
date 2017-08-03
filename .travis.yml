@@ -27,6 +27,15 @@ before_install:
   - printf "ndk.dir=$ANDROID_NDK" > local.properties
 after_success:
   - ls -laR app/build/outputs
+deploy:
+  provider: releases
+  api_key:
+    secure: "FxhgpuzdvKtr5+1fNAWGzUx5ExG0Mp+S5wC5urxhuvhUKyEMCc20ReoZhrFyMwUJdxlNJqODjuznvS/sZrMEOK2cFIWrwPwU5ymP4bkAgdFBj0azy8pitTN7EDXV18sZJmMp5IL9B2ZfBHJ6smvdfBmnYYpqOL2l7TBb4Np0gDWGDmgtNVTP62KR+OLnnvFz45//IpyAXQfx3rrPImSueIsXEFrkNDXrE9gPHVcHFUomCedOKSYUQ4D4GRLDWmvVleRsgtU+3j/1l3+xHGlGxrToG6Zv/OyVkEKYnwEX2LddicIJZQuwvF6J2f+wwHrwX6EVAtTsKVhtnbc7GuJM0h9SKCkG49bsyEQHDf/taxWvIQ3yKcpp4v0Nk830RbO1fR4hbt211S34NKdqWKje54H9snhP9p4lV9ZTUVk0ABNEPG6Ol7ULlFdJm77oxaJxrKXDR11ii7HoBMeddpSO+LTgntHDg98hOGhfasPmylwho24fRXdZyAZSJZMvO2UaCg3lVlMwa41Tql0bpARnSEP2zOF271TvHCn0XPP2IvQKJXPNrbtiYkYahfxe5w2F5PYK7bH56XP6HWo3Z54HtC19JQjJLX5IgU/iqlqNlnjHFPvVkNDLkNlV81X2178rwS04uamtgGzw+GNYdBT4wHddBroYvMCawzfNVjpmJMI="
+  file: app/build/outputs/apk/OpenXcom*.apk
+  file_glob: true
+  skip_cleanup: true
+  on:
+    tags: true
 android:
   components:
     - tools
