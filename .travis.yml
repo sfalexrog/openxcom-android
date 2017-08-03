@@ -12,8 +12,10 @@ env:
   - BUILD_ARCH_LIST='x86_64'
   - BUILD_ARCH_LIST='arm64-v8a'
 before_install:
+  - openssl enc -d -aes-256-cbc -in private.enc -out private.7z -md sha256 -pass $TRAVIS_PRIVATE_PASS
+  - 7z x private.7z > /dev/null
   - yes | ${ANDROID_HOME}/tools/bin/sdkmanager --update
-  - wget --timeout=120 https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip -O ndk.zip
+  - wget --timeout=120 --quiet https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip -O ndk.zip
   - sha1sum ndk.zip | grep 0bf02d4e8b85fd770fd7b9b2cdec57f9441f27a2
   - 7z x ndk.zip > /dev/null
   - export ANDROID_NDK=$(pwd)/android-ndk-r15c
