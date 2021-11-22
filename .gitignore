@@ -33,6 +33,8 @@ app/src/main/obj/
 app/src/main/libs/
 
 #auto-generated files
+app/.cxx/
+app/release/
 app/src/main/assets/3_TFTD.zip.MD5
 app/src/main/assets/7_translations.zip
 app/src/main/assets/3_TFTD.zip
